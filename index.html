@@ -1,0 +1,840 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Gulian Ibrahim // Data Engineer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ── TOKENS ─────────────────────────────────────────────────── */
+:root {
+  --void:     #040D14;
+  --surface:  #0B1622;
+  --panel:    #111F2E;
+  --border:   #1A3348;
+  --teal:     #00FFD1;
+  --violet:   #8B5CF6;
+  --pink:     #FF2D6B;
+  --text:     #C8D8E8;
+  --dim:      #5A7A90;
+  --mono:     'Space Mono', monospace;
+  --sans:     'Inter', sans-serif;
+}
+
+/* ── RESET ──────────────────────────────────────────────────── */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--void);color:var(--text);font-family:var(--sans);
+     line-height:1.7;overflow-x:hidden}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+img{max-width:100%}
+
+/* ── SCANLINES OVERLAY ──────────────────────────────────────── */
+body::before{
+  content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
+  background:repeating-linear-gradient(
+    0deg,transparent,transparent 2px,
+    rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);
+}
+
+/* ── CANVAS PARTICLES ───────────────────────────────────────── */
+#canvas{position:fixed;inset:0;z-index:0;opacity:.45;pointer-events:none}
+
+/* ── LAYOUT SHELL ───────────────────────────────────────────── */
+.page{position:relative;z-index:1}
+section{padding:5rem 0}
+.container{max-width:1100px;margin:0 auto;padding:0 2rem}
+
+/* ── NAV ─────────────────────────────────────────────────────── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  border-bottom:1px solid var(--border);
+  background:rgba(4,13,20,.85);
+  backdrop-filter:blur(12px);
+  padding:.85rem 2rem;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.nav-logo{font-family:var(--mono);font-size:.85rem;color:var(--teal);letter-spacing:.08em}
+.nav-logo span{color:var(--dim)}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{font-family:var(--mono);font-size:.75rem;color:var(--dim);
+             letter-spacing:.06em;transition:color .2s}
+.nav-links a:hover{color:var(--teal);text-decoration:none}
+
+/* ── HERO ───────────────────────────────────────────────────── */
+#hero{
+  min-height:100vh;display:flex;align-items:center;
+  padding-top:5rem;border-bottom:1px solid var(--border);
+}
+.hero-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
+.hero-tag{
+  font-family:var(--mono);font-size:.72rem;color:var(--teal);
+  letter-spacing:.15em;margin-bottom:1.5rem;opacity:.8;
+}
+.hero-name{
+  font-family:var(--mono);font-size:clamp(2.4rem,5vw,3.8rem);
+  font-weight:700;line-height:1.1;color:#fff;
+  margin-bottom:.5rem;
+}
+.hero-name .cursor{
+  display:inline-block;width:3px;height:1em;
+  background:var(--teal);margin-left:4px;
+  animation:blink 1s step-end infinite;vertical-align:middle;
+}
+@keyframes blink{50%{opacity:0}}
+.hero-role{
+  font-family:var(--sans);font-size:1.1rem;font-weight:300;
+  color:var(--violet);margin-bottom:2rem;letter-spacing:.02em;
+}
+.hero-bio{
+  font-size:.95rem;color:var(--dim);max-width:45ch;line-height:1.8;
+  margin-bottom:2.5rem;
+}
+.hero-cta{display:flex;gap:1rem;flex-wrap:wrap}
+.btn{
+  font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;
+  padding:.7rem 1.5rem;border:1px solid;cursor:pointer;
+  transition:background .2s,color .2s;display:inline-block;
+}
+.btn-primary{border-color:var(--teal);color:var(--teal)}
+.btn-primary:hover{background:var(--teal);color:var(--void);text-decoration:none}
+.btn-ghost{border-color:var(--border);color:var(--dim)}
+.btn-ghost:hover{border-color:var(--violet);color:var(--violet);text-decoration:none}
+
+/* hero terminal pane */
+.hero-terminal{
+  background:var(--surface);border:1px solid var(--border);
+  font-family:var(--mono);font-size:.82rem;
+}
+.term-bar{
+  background:var(--panel);padding:.6rem 1rem;
+  display:flex;align-items:center;gap:.5rem;
+  border-bottom:1px solid var(--border);
+}
+.dot{width:11px;height:11px;border-radius:50%}
+.dot-r{background:#FF5F57}.dot-y{background:#FEBC2E}.dot-g{background:#28C840}
+.term-title{font-size:.7rem;color:var(--dim);margin-left:.5rem}
+.term-body{padding:1.25rem;line-height:2;min-height:260px}
+.term-line{color:var(--dim)}
+.term-line .prompt{color:var(--teal)}
+.term-line .cmd{color:#fff}
+.term-line .out{color:var(--violet)}
+.term-line .ok{color:var(--teal)}
+.term-line .warn{color:#F59E0B}
+#boot-output .boot-text{opacity:0;transition:opacity .1s}
+#boot-output .boot-text.visible{opacity:1}
+
+/* ── SECTION LABELS ─────────────────────────────────────────── */
+.section-label{
+  font-family:var(--mono);font-size:.7rem;color:var(--teal);
+  letter-spacing:.18em;margin-bottom:.75rem;opacity:.7;
+}
+.section-heading{
+  font-family:var(--mono);font-size:clamp(1.5rem,3vw,2.2rem);
+  font-weight:700;color:#fff;margin-bottom:1rem;
+}
+.section-sub{font-size:.95rem;color:var(--dim);max-width:55ch;margin-bottom:3rem}
+
+/* ── SKILLS GRAPH ───────────────────────────────────────────── */
+#skills{border-bottom:1px solid var(--border)}
+.skills-wrap{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+#skill-canvas-wrap{
+  background:var(--surface);border:1px solid var(--border);
+  aspect-ratio:1;position:relative;overflow:hidden;
+}
+#skill-canvas{width:100%;height:100%}
+.skill-legend{display:flex;flex-direction:column;gap:1.25rem}
+.skill-item{}
+.skill-header{display:flex;justify-content:space-between;align-items:baseline;
+              margin-bottom:.4rem}
+.skill-name{font-family:var(--mono);font-size:.82rem;color:#fff}
+.skill-pct{font-family:var(--mono);font-size:.72rem;color:var(--dim)}
+.skill-bar{height:2px;background:var(--border);position:relative}
+.skill-fill{
+  height:2px;position:absolute;top:0;left:0;width:0;
+  transition:width 1.2s cubic-bezier(.4,0,.2,1);
+}
+.skill-fill.teal{background:var(--teal);box-shadow:0 0 8px var(--teal)}
+.skill-fill.violet{background:var(--violet);box-shadow:0 0 8px var(--violet)}
+.skill-fill.pink{background:var(--pink);box-shadow:0 0 8px var(--pink)}
+.skill-fill.gold{background:#F59E0B;box-shadow:0 0 8px #F59E0B}
+.skill-tag{
+  display:inline-block;font-family:var(--mono);font-size:.65rem;
+  padding:.2rem .55rem;border:1px solid;margin-top:.35rem;
+  letter-spacing:.05em;
+}
+.skill-tag.teal{border-color:var(--teal);color:var(--teal)}
+.skill-tag.violet{border-color:var(--violet);color:var(--violet)}
+.skill-tag.pink{border-color:var(--pink);color:var(--pink)}
+.skill-tag.gold{border-color:#F59E0B;color:#F59E0B}
+
+/* ── PIPELINE DIVIDER ───────────────────────────────────────── */
+.pipeline{
+  display:flex;align-items:center;gap:0;
+  padding:2.5rem 0;overflow-x:auto;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+}
+.pipe-node{
+  flex-shrink:0;
+  font-family:var(--mono);font-size:.7rem;color:var(--teal);
+  border:1px solid var(--teal);padding:.4rem .9rem;letter-spacing:.06em;
+  white-space:nowrap;position:relative;
+}
+.pipe-arrow{
+  flex-shrink:0;width:48px;height:2px;background:var(--border);
+  position:relative;
+}
+.pipe-arrow::after{
+  content:'';position:absolute;right:0;top:50%;transform:translateY(-50%);
+  border-top:5px solid transparent;border-bottom:5px solid transparent;
+  border-left:7px solid var(--dim);
+}
+.pipe-arrow.active::after{border-left-color:var(--teal)}
+.pipe-arrow.active{background:var(--teal);box-shadow:0 0 10px rgba(0,255,209,.4)}
+
+/* ── PROJECTS ───────────────────────────────────────────────── */
+#projects{border-bottom:1px solid var(--border)}
+.projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem}
+.proj-terminal{
+  background:var(--surface);border:1px solid var(--border);
+  transition:border-color .25s;
+}
+.proj-terminal:hover{border-color:var(--teal)}
+.proj-bar{
+  background:var(--panel);padding:.55rem 1rem;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.proj-dots{display:flex;gap:.4rem}
+.proj-label{font-family:var(--mono);font-size:.65rem;color:var(--dim)}
+.proj-body{padding:1.25rem}
+.proj-title{font-family:var(--mono);font-size:1rem;color:#fff;margin-bottom:.5rem}
+.proj-title .prompt{color:var(--teal);margin-right:.4rem}
+.proj-desc{font-size:.88rem;color:var(--dim);line-height:1.7;margin-bottom:1rem}
+.proj-tags{display:flex;flex-wrap:wrap;gap:.4rem;margin-bottom:1.25rem}
+.tag{
+  font-family:var(--mono);font-size:.62rem;padding:.2rem .5rem;
+  border:1px solid var(--border);color:var(--dim);letter-spacing:.04em;
+}
+.proj-links{display:flex;gap:1rem}
+.proj-link{font-family:var(--mono);font-size:.72rem;color:var(--dim);
+           padding:.35rem .75rem;border:1px solid var(--border);
+           transition:color .2s,border-color .2s}
+.proj-link:hover{color:var(--teal);border-color:var(--teal);text-decoration:none}
+
+/* ── EXPERIENCE / EDUCATION ─────────────────────────────────── */
+#experience{border-bottom:1px solid var(--border)}
+.timeline{position:relative;padding-left:2rem}
+.timeline::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;
+  width:1px;background:var(--border);
+}
+.tl-item{position:relative;margin-bottom:2.5rem}
+.tl-item::before{
+  content:'';position:absolute;left:-2rem;top:.35rem;
+  width:9px;height:9px;border:1px solid var(--teal);
+  background:var(--void);transform:rotate(45deg);
+}
+.tl-period{font-family:var(--mono);font-size:.7rem;color:var(--teal);
+           letter-spacing:.1em;margin-bottom:.25rem}
+.tl-title{font-family:var(--mono);font-size:.98rem;color:#fff;margin-bottom:.15rem}
+.tl-org{font-size:.85rem;color:var(--violet);margin-bottom:.5rem}
+.tl-desc{font-size:.88rem;color:var(--dim);line-height:1.7;max-width:60ch}
+.tl-tags{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.65rem}
+
+/* ── HACKATHON BADGE ─────────────────────────────────────────── */
+.hackathon-card{
+  background:var(--surface);border:1px solid var(--violet);
+  padding:1.5rem 2rem;margin-top:3rem;
+  display:grid;grid-template-columns:auto 1fr;gap:1.5rem;align-items:center;
+}
+.hack-rank{
+  font-family:var(--mono);font-size:3rem;font-weight:700;
+  color:var(--violet);line-height:1;
+}
+.hack-rank small{font-size:.9rem;display:block;color:var(--dim)}
+.hack-info h3{font-family:var(--mono);font-size:1rem;color:#fff;margin-bottom:.3rem}
+.hack-info p{font-size:.85rem;color:var(--dim)}
+.hack-score{font-family:var(--mono);font-size:.78rem;color:var(--teal);margin-top:.4rem}
+
+/* ── CONTACT TERMINAL ────────────────────────────────────────── */
+#contact{border-bottom:1px solid var(--border)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}
+.contact-terminal{
+  background:var(--surface);border:1px solid var(--border);
+  font-family:var(--mono);font-size:.82rem;
+}
+.contact-links{display:flex;flex-direction:column;gap:1rem;padding-top:.5rem}
+.c-link{
+  display:flex;align-items:center;gap:1rem;padding:.9rem 1rem;
+  border:1px solid var(--border);transition:border-color .2s,background .2s;
+  color:var(--dim);text-decoration:none;
+}
+.c-link:hover{border-color:var(--teal);background:rgba(0,255,209,.04);
+              color:var(--teal);text-decoration:none}
+.c-icon{width:32px;text-align:center;font-size:1.1rem;flex-shrink:0}
+.c-label{font-family:var(--mono);font-size:.78rem}
+.c-label small{display:block;font-size:.65rem;color:var(--dim);margin-top:.1rem}
+.contact-form-note{
+  font-size:.85rem;color:var(--dim);line-height:1.7;margin-top:1.5rem;
+}
+
+/* ── FOOTER ──────────────────────────────────────────────────── */
+footer{
+  padding:2rem;text-align:center;
+  font-family:var(--mono);font-size:.72rem;color:var(--dim);
+  border-top:1px solid var(--border);
+}
+footer span{color:var(--teal)}
+
+/* ── RESPONSIVE ──────────────────────────────────────────────── */
+@media(max-width:768px){
+  .hero-inner{grid-template-columns:1fr}
+  .skills-wrap{grid-template-columns:1fr}
+  .contact-grid{grid-template-columns:1fr}
+  .hackathon-card{grid-template-columns:1fr}
+  .hero-terminal{display:none}
+  .nav-links{display:none}
+}
+
+/* ── REDUCED MOTION ─────────────────────────────────────────── */
+@media(prefers-reduced-motion:reduce){
+  *{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo"><span>~/</span>gulian-ibrahim</div>
+  <ul class="nav-links">
+    <li><a href="#skills">skills</a></li>
+    <li><a href="#projects">projects</a></li>
+    <li><a href="#experience">experience</a></li>
+    <li><a href="#contact">contact</a></li>
+  </ul>
+</nav>
+
+<div class="page">
+
+<!-- HERO -->
+<section id="hero">
+  <div class="container">
+    <div class="hero-inner">
+      <div>
+        <div class="hero-tag">// SYSTEM ONLINE — Cape Town, ZA</div>
+        <div class="hero-name">Gulian Ibrahim<span class="cursor"></span></div>
+        <div class="hero-role">Aspiring Data Engineer &amp; Software Developer</div>
+        <p class="hero-bio">
+          Building systems that move, transform, and expose data.
+          Currently studying Computing at STADIO; previously shipped
+          real IT operations solo at Legates Group. Competes in hackathons,
+          writes code, makes music on the side.
+        </p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#projects">View Projects</a>
+          <a class="btn btn-ghost" href="https://github.com/AgCat80" target="_blank" rel="noopener">GitHub Profile</a>
+        </div>
+      </div>
+
+      <div class="hero-terminal">
+        <div class="term-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="term-title">gulian@photospheria:~</span>
+        </div>
+        <div class="term-body" id="boot-output"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA PIPELINE -->
+<div class="container">
+  <div class="pipeline">
+    <div class="pipe-node">INGEST</div>
+    <div class="pipe-arrow active"></div>
+    <div class="pipe-node">TRANSFORM</div>
+    <div class="pipe-arrow active"></div>
+    <div class="pipe-node">VALIDATE</div>
+    <div class="pipe-arrow active"></div>
+    <div class="pipe-node">LOAD</div>
+    <div class="pipe-arrow active"></div>
+    <div class="pipe-node">VISUALISE</div>
+    <div class="pipe-arrow"></div>
+    <div class="pipe-node" style="border-color:var(--violet);color:var(--violet)">INSIGHT</div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<section id="skills">
+  <div class="container">
+    <div class="section-label">// CAPABILITY MATRIX</div>
+    <h2 class="section-heading">Technical Stack</h2>
+    <p class="section-sub">Core languages and frameworks, weighted by depth of daily use and project delivery.</p>
+    <div class="skills-wrap">
+      <div id="skill-canvas-wrap">
+        <canvas id="skill-canvas"></canvas>
+      </div>
+      <div class="skill-legend" id="skill-legend">
+        <!-- injected by JS -->
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="projects">
+  <div class="container">
+    <div class="section-label">// PROJECT LOG</div>
+    <h2 class="section-heading">Selected Work</h2>
+    <p class="section-sub">A mix of academic, competitive, and personal builds.</p>
+    <div class="projects-grid">
+
+      <div class="proj-terminal">
+        <div class="proj-bar">
+          <div class="proj-dots">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          </div>
+          <span class="proj-label">proj_01 // C#</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title"><span class="prompt">&gt;</span> ASP.NET Web Platform</div>
+          <p class="proj-desc">Full-stack ASP.NET web application built during studies at Eduvos. Covers MVC architecture, SQL Server integration, user authentication and dynamic content management.</p>
+          <div class="proj-tags">
+            <span class="tag">C#</span><span class="tag">ASP.NET</span>
+            <span class="tag">SQL Server</span><span class="tag">MVC</span><span class="tag">Entity Framework</span>
+          </div>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/AgCat80" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-terminal">
+        <div class="proj-bar">
+          <div class="proj-dots">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          </div>
+          <span class="proj-label">proj_02 // Python</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title"><span class="prompt">&gt;</span> Photospheria Solver</div>
+          <p class="proj-desc">Competitive simulation solver built under 5-hour hackathon pressure for Entelect HackIT 2026. Implements a phased plant-unlock chain across a 2D cellular automata grid, placing 15,000+ actions across four levels.</p>
+          <div class="proj-tags">
+            <span class="tag">Python</span><span class="tag">Algorithms</span>
+            <span class="tag">Simulation</span><span class="tag">JSON</span><span class="tag">Competitive</span>
+          </div>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/AgCat80" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-terminal">
+        <div class="proj-bar">
+          <div class="proj-dots">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          </div>
+          <span class="proj-label">proj_03 // Python</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title"><span class="prompt">&gt;</span> ScreenRand</div>
+          <p class="proj-desc">CLI content-idea generator for South African creators. Produces random ideas by category, generates weekly schedules, gives platform-specific tips, and persists history to a local JSON store.</p>
+          <div class="proj-tags">
+            <span class="tag">Python</span><span class="tag">CLI</span>
+            <span class="tag">JSON I/O</span><span class="tag">SA Creator Economy</span>
+          </div>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/AgCat80" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-terminal">
+        <div class="proj-bar">
+          <div class="proj-dots">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          </div>
+          <span class="proj-label">proj_04 // Java</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title"><span class="prompt">&gt;</span> Hangman + Word Puzzle</div>
+          <p class="proj-desc">Two console games built in Java for NetBeans. Hangman features SA-themed word categories and a live ASCII gallows. Word Puzzle offers three game modes: Unscramble, Fill-in-the-Blank, and Clue Guess.</p>
+          <div class="proj-tags">
+            <span class="tag">Java</span><span class="tag">NetBeans</span>
+            <span class="tag">OOP</span><span class="tag">Console Games</span>
+          </div>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/AgCat80" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-terminal">
+        <div class="proj-bar">
+          <div class="proj-dots">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          </div>
+          <span class="proj-label">proj_05 // C++</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title"><span class="prompt">&gt;</span> Tinkercad Electronics</div>
+          <p class="proj-desc">Hardware simulation project using Tinkercad and C++ for microcontroller logic. Combines circuit design with embedded programming fundamentals.</p>
+          <div class="proj-tags">
+            <span class="tag">C++</span><span class="tag">Tinkercad</span>
+            <span class="tag">Electronics</span><span class="tag">Embedded</span>
+          </div>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/AgCat80" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="proj-terminal" style="border-color:var(--violet)">
+        <div class="proj-bar">
+          <div class="proj-dots">
+            <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
+          </div>
+          <span class="proj-label" style="color:var(--violet)">proj_06 // DATA</span>
+        </div>
+        <div class="proj-body">
+          <div class="proj-title"><span class="prompt" style="color:var(--violet)">&gt;</span> Data Pipeline Scripts</div>
+          <p class="proj-desc">Collection of SQL, Python, and shell scripts for ETL workflows. Covers database design, query optimisation, and structured data transformation — aligned with a long-term goal of data engineering.</p>
+          <div class="proj-tags">
+            <span class="tag">Python</span><span class="tag">SQL</span>
+            <span class="tag">MySQL</span><span class="tag">ETL</span><span class="tag">Data Engineering</span>
+          </div>
+          <div class="proj-links">
+            <a class="proj-link" href="https://github.com/AgCat80" target="_blank" rel="noopener">GitHub</a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- EXPERIENCE -->
+<section id="experience">
+  <div class="container">
+    <div class="section-label">// CAREER &amp; EDUCATION LOG</div>
+    <h2 class="section-heading">Experience</h2>
+    <p class="section-sub">Professional history and academic background.</p>
+
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-period">2026 — PRESENT</div>
+        <div class="tl-title">Bachelor's Degree in Computing</div>
+        <div class="tl-org">STADIO Higher Education</div>
+        <p class="tl-desc">Full computing degree with a long-term focus on data engineering. Covers software architecture, databases, algorithms and systems design.</p>
+        <div class="tl-tags"><span class="tag">Computing</span><span class="tag">Data Engineering</span></div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-period">MAR 2024 — JAN 2025</div>
+        <div class="tl-title">Head of IT Staff</div>
+        <div class="tl-org">Legates Group (Pty) Ltd</div>
+        <p class="tl-desc">Sole IT point of contact for the entire organisation. Built and maintained the company website, managed digital image across platforms, and provided on-site and off-site technical support independently. Resolved hardware, software and network issues while managing multiple priorities without escalation.</p>
+        <div class="tl-tags">
+          <span class="tag">Web Management</span><span class="tag">IT Support</span>
+          <span class="tag">Networking</span><span class="tag">Systems Admin</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-period">2022 — 2025</div>
+        <div class="tl-title">Higher Certificate in Information Systems (Software Development)</div>
+        <div class="tl-org">Eduvos, Tygervalley — NQF Level 5 | 128 Credits | Completed</div>
+        <p class="tl-desc">Strong academic foundation in database design, software engineering, C# programming, Python, SQL, and systems development. Achieved distinctions in Database Design Concepts, Software Engineering, Processing and Logic Concepts, and more.</p>
+        <div class="tl-tags">
+          <span class="tag">C#</span><span class="tag">Python</span>
+          <span class="tag">SQL</span><span class="tag">Software Engineering</span>
+          <span class="tag">Database Design</span>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-period">DEC 2021 — FEB 2022</div>
+        <div class="tl-title">Tyre Technician (Informal)</div>
+        <div class="tl-org">Zoe's Tyre Services, Queenstown</div>
+        <p class="tl-desc">Customer-facing role that built direct negotiation, client management, and problem-solving skills under real commercial pressure.</p>
+        <div class="tl-tags"><span class="tag">Customer Service</span><span class="tag">Negotiation</span></div>
+      </div>
+    </div>
+
+    <!-- HACKATHON BADGE -->
+    <div class="hackathon-card">
+      <div class="hack-rank">
+        #124<small>out of 990+</small>
+      </div>
+      <div class="hack-info">
+        <h3>Entelect HackIT 2026 — Photospheria Challenge</h3>
+        <p>Individual competitive hackathon. Built a multi-level plant ecosystem simulation solver in Python under 5 hours. Generated 15,000+ deterministic planting actions across a 200×300 grid.</p>
+        <div class="hack-score">SCORE: 660,190,269 pts</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <div class="section-label">// ESTABLISH CONNECTION</div>
+    <h2 class="section-heading">Contact</h2>
+    <p class="section-sub">Open to IT roles, data engineering opportunities, freelance work and collaborations.</p>
+
+    <div class="contact-grid">
+      <div class="contact-terminal">
+        <div class="term-bar">
+          <div class="dot dot-r"></div>
+          <div class="dot dot-y"></div>
+          <div class="dot dot-g"></div>
+          <span class="term-title">contact.sh</span>
+        </div>
+        <div class="term-body">
+          <div class="term-line"><span class="prompt">&gt; </span><span class="cmd">whoami</span></div>
+          <div class="term-line"><span class="out">Gulian Ibrahim — Cape Town, ZA</span></div>
+          <br/>
+          <div class="term-line"><span class="prompt">&gt; </span><span class="cmd">cat status.txt</span></div>
+          <div class="term-line"><span class="ok">[OPEN]</span> Available for work</div>
+          <div class="term-line"><span class="ok">[OPEN]</span> Freelance &amp; contract</div>
+          <div class="term-line"><span class="warn">[STUDYING]</span> BSc Computing @ STADIO</div>
+          <br/>
+          <div class="term-line"><span class="prompt">&gt; </span><span class="cmd">echo $TARGET_ROLE</span></div>
+          <div class="term-line"><span class="out">Data Engineer / IT Support / Systems Dev</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="contact-links">
+          <a class="c-link" href="mailto:ibrahimgulian404@gmail.com">
+            <div class="c-icon">✉</div>
+            <div class="c-label">ibrahimgulian404@gmail.com<small>Email</small></div>
+          </a>
+          <a class="c-link" href="https://github.com/AgCat80" target="_blank" rel="noopener">
+            <div class="c-icon">⌥</div>
+            <div class="c-label">github.com/AgCat80<small>GitHub</small></div>
+          </a>
+          <a class="c-link" href="https://www.linkedin.com/in/gulian-ibrahim-313a03261/" target="_blank" rel="noopener">
+            <div class="c-icon">◈</div>
+            <div class="c-label">linkedin.com/in/gulian-ibrahim-313a03261<small>LinkedIn</small></div>
+          </a>
+          <a class="c-link" href="https://wa.me/27693409750" target="_blank" rel="noopener">
+            <div class="c-icon">◉</div>
+            <div class="c-label">+27 69 340 9750<small>WhatsApp</small></div>
+          </a>
+        </div>
+        <p class="contact-form-note">
+          For quick responses, WhatsApp or LinkedIn direct message is preferred.
+          Based in Cape Town; open to remote work across South Africa.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div>built by <span>Gulian Ibrahim</span> // <span>AgCat80</span> on GitHub // Cape Town 2026</div>
+</footer>
+
+</div><!-- .page -->
+
+<script>
+/* ── PARTICLE CANVAS ──────────────────────────────────────── */
+(function(){
+  const canvas=document.getElementById('canvas');
+  const ctx=canvas.getContext('2d');
+  let W,H,particles=[];
+
+  function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight}
+  resize();window.addEventListener('resize',()=>{resize();init()});
+
+  function rand(a,b){return a+Math.random()*(b-a)}
+
+  class Particle{
+    constructor(){this.reset()}
+    reset(){
+      this.x=rand(0,W);
+      this.y=rand(0,H);
+      this.vx=rand(-0.4,0.4);
+      this.vy=rand(0.2,0.8);
+      this.size=rand(1,2.5);
+      this.life=rand(0.3,1);
+      this.color=Math.random()<0.6?'#00FFD1':Math.random()<0.5?'#8B5CF6':'#FF2D6B';
+    }
+    update(){
+      this.x+=this.vx;this.y+=this.vy;this.life-=0.002;
+      if(this.life<=0||this.y>H)this.reset();
+    }
+    draw(){
+      ctx.globalAlpha=this.life*0.6;
+      ctx.fillStyle=this.color;
+      ctx.shadowColor=this.color;
+      ctx.shadowBlur=6;
+      ctx.fillRect(this.x,this.y,this.size,this.size*3);
+    }
+  }
+
+  function init(){particles=[];for(let i=0;i<120;i++)particles.push(new Particle())}
+  init();
+
+  function loop(){
+    ctx.clearRect(0,0,W,H);
+    ctx.shadowBlur=0;
+    particles.forEach(p=>{p.update();p.draw()});
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+/* ── BOOT TERMINAL ────────────────────────────────────────── */
+(function(){
+  const out=document.getElementById('boot-output');
+  const lines=[
+    {type:'prompt',cmd:'system --boot',delay:200},
+    {type:'out',text:'> Initialising Gulian Ibrahim v22.0 ...',delay:600},
+    {type:'ok', text:'> [OK] Software Engineering Module loaded',delay:900},
+    {type:'ok', text:'> [OK] Data Pipeline Layer online',delay:1200},
+    {type:'ok', text:'> [OK] Python runtime detected (3.11)',delay:1500},
+    {type:'ok', text:'> [OK] C# ASP.NET runtime detected',delay:1800},
+    {type:'warn',text:'> [INFO] Hackathon mode: previously engaged',delay:2100},
+    {type:'ok', text:'> [OK] Golden Key member — top 15% cohort',delay:2400},
+    {type:'prompt',cmd:'status --brief',delay:2800},
+    {type:'out', text:'> Cape Town | Remote-ready | Open to work',delay:3100},
+  ];
+
+  lines.forEach(line=>{
+    setTimeout(()=>{
+      const div=document.createElement('div');
+      div.className='term-line';
+      if(line.type==='prompt'){
+        div.innerHTML=`<span class="prompt">&gt; </span><span class="cmd">${line.cmd}</span>`;
+      } else if(line.type==='ok'){
+        div.innerHTML=`<span class="ok">${line.text}</span>`;
+      } else if(line.type==='warn'){
+        div.innerHTML=`<span class="warn">${line.text}</span>`;
+      } else {
+        div.innerHTML=`<span class="out">${line.text}</span>`;
+      }
+      out.appendChild(div);
+      out.scrollTop=out.scrollHeight;
+    },line.delay);
+  });
+})();
+
+/* ── SKILLS ───────────────────────────────────────────────── */
+(function(){
+  const skills=[
+    {name:'C#  /  ASP.NET',pct:85,color:'teal',tags:['Backend','Web','OOP']},
+    {name:'Python',pct:80,color:'violet',tags:['Scripting','Data','Automation']},
+    {name:'SQL  /  Databases',pct:82,color:'teal',tags:['MySQL','SQL Server','Design']},
+    {name:'Java',pct:70,color:'pink',tags:['OOP','Console Apps']},
+    {name:'JavaScript  /  Web',pct:65,color:'gold',tags:['HTML','CSS','DOM']},
+    {name:'C++',pct:55,color:'pink',tags:['Embedded','Tinkercad']},
+    {name:'Git  /  GitHub',pct:75,color:'violet',tags:['Version Control','CI']},
+    {name:'Data Engineering',pct:50,color:'teal',tags:['ETL','Pipelines','Goal']},
+  ];
+
+  // Render legend
+  const legend=document.getElementById('skill-legend');
+  skills.forEach(s=>{
+    const div=document.createElement('div');div.className='skill-item';
+    div.innerHTML=`
+      <div class="skill-header">
+        <span class="skill-name">${s.name}</span>
+        <span class="skill-pct">${s.pct}%</span>
+      </div>
+      <div class="skill-bar">
+        <div class="skill-fill ${s.color}" data-pct="${s.pct}" style="width:0"></div>
+      </div>
+      <div style="margin-top:.4rem">
+        ${s.tags.map(t=>`<span class="skill-tag ${s.color}">${t}</span> `).join('')}
+      </div>`;
+    legend.appendChild(div);
+  });
+
+  // Animate bars on scroll
+  const fills=document.querySelectorAll('.skill-fill');
+  const observer=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        fills.forEach(f=>{
+          f.style.width=f.dataset.pct+'%';
+        });
+        observer.disconnect();
+      }
+    });
+  },{threshold:.3});
+  const section=document.getElementById('skills');
+  if(section)observer.observe(section);
+
+  // Skill node canvas
+  const canvas=document.getElementById('skill-canvas');
+  const wrap=document.getElementById('skill-canvas-wrap');
+  canvas.width=wrap.offsetWidth;
+  canvas.height=wrap.offsetWidth;
+  const ctx=canvas.getContext('2d');
+  const cx=canvas.width/2,cy=canvas.height/2;
+
+  const nodes=[
+    {label:'C#',x:cx,y:cy-90,color:'#00FFD1',r:28},
+    {label:'Python',x:cx+85,y:cy-40,color:'#8B5CF6',r:24},
+    {label:'SQL',x:cx+70,y:cy+60,color:'#00FFD1',r:22},
+    {label:'Java',x:cx,y:cy+100,color:'#FF2D6B',r:20},
+    {label:'JS',x:cx-70,y:cy+60,color:'#F59E0B',r:18},
+    {label:'C++',x:cx-85,y:cy-40,color:'#FF2D6B',r:18},
+    {label:'Git',x:cx-40,y:cy-10,color:'#8B5CF6',r:16},
+    {label:'ETL',x:cx+40,y:cy-10,color:'#00FFD1',r:16},
+    {label:'Core',x:cx,y:cy,color:'#ffffff',r:12},
+  ];
+  const edges=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],
+               [0,1],[1,2],[0,7],[2,3],[1,7],[0,6]];
+
+  let t=0;
+  function drawSkillGraph(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    // edges
+    edges.forEach(([a,b])=>{
+      const na=nodes[a],nb=nodes[b];
+      ctx.beginPath();
+      ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);
+      ctx.strokeStyle='rgba(255,255,255,.06)';
+      ctx.lineWidth=1;ctx.stroke();
+    });
+    // pulse along edges
+    edges.forEach(([a,b],i)=>{
+      const na=nodes[a],nb=nodes[b];
+      const prog=(t*0.3+i*0.7)%1;
+      const px=na.x+(nb.x-na.x)*prog;
+      const py=na.y+(nb.y-na.y)*prog;
+      ctx.beginPath();ctx.arc(px,py,2.5,0,Math.PI*2);
+      ctx.fillStyle=na.color;ctx.globalAlpha=0.7;ctx.fill();ctx.globalAlpha=1;
+    });
+    // nodes
+    nodes.forEach(n=>{
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.fillStyle=n.color+'18';ctx.fill();
+      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.strokeStyle=n.color;ctx.lineWidth=1.5;
+      ctx.shadowColor=n.color;ctx.shadowBlur=10;ctx.stroke();
+      ctx.shadowBlur=0;
+      ctx.fillStyle=n.label==='Core'?'#fff':n.color;
+      ctx.font=`bold ${Math.max(9,n.r*0.55)}px 'Space Mono',monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(n.label,n.x,n.y);
+    });
+    t+=0.015;
+    requestAnimationFrame(drawSkillGraph);
+  }
+  drawSkillGraph();
+})();
+</script>
+</body>
+</html>
