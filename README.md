@@ -8,7 +8,7 @@ A sci-fi / cyber-tech themed developer portfolio built with vanilla HTML, CSS an
 
 ## Live Demo
 
-> [https://agcat80.github.io/portfolio](https://agcat80.github.io/portfolio)
+> [https://agcat80.github.io/portfolio](https://agcat80.github.io/portfolio-website)
 
 ## Features
 
@@ -46,7 +46,7 @@ A sci-fi / cyber-tech themed developer portfolio built with vanilla HTML, CSS an
 No build step needed:
 
 ```bash
-git clone https://github.com/AgCat80/portfolio.git
+git clone https://github.com/AgCat80/portfolio-website.git
 cd portfolio
 # open index.html in your browser, or use a simple server:
 python3 -m http.server 8080
