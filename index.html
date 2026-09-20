@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="icon" type="image/png" href="ag-favicon.png">
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Gulian Ibrahim // Data Engineer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -304,11 +304,190 @@ footer span{color:var(--teal)}
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
 }
+
+/* ── CUSTOM CURSOR ──────────────────────────────────────────── */
+body { cursor: none; }
+a, button, .btn, .proj-terminal, .c-link, .nav-links a { cursor: none; }
+
+#cursor-dot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 6px; height: 6px;
+  background: var(--teal);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px var(--teal), 0 0 20px rgba(0,255,209,.4);
+  transition: width .15s, height .15s, background .2s;
+}
+
+#cursor-ring {
+  position: fixed;
+  top: 0; left: 0;
+  width: 32px; height: 32px;
+  border: 1px solid var(--teal);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%, -50%);
+  opacity: 0.5;
+  transition: width .35s cubic-bezier(.4,0,.2,1),
+              height .35s cubic-bezier(.4,0,.2,1),
+              opacity .35s,
+              border-color .2s;
+}
+
+body.cursor-hover #cursor-dot {
+  width: 10px; height: 10px;
+  background: var(--violet);
+  box-shadow: 0 0 14px var(--violet), 0 0 28px rgba(139,92,246,.5);
+}
+
+body.cursor-hover #cursor-ring {
+  width: 50px; height: 50px;
+  border-color: var(--violet);
+  opacity: 0.35;
+}
+
+body.cursor-click #cursor-dot {
+  width: 4px; height: 4px;
+  background: var(--pink);
+  box-shadow: 0 0 20px var(--pink);
+}
+
+body.cursor-click #cursor-ring {
+  width: 20px; height: 20px;
+  border-color: var(--pink);
+  opacity: 0.9;
+}
+
+/* ── SECTION REVEAL ─────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity .7s cubic-bezier(.4,0,.2,1),
+              transform .7s cubic-bezier(.4,0,.2,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ── GLITCH ON HERO NAME ────────────────────────────────────── */
+.hero-name {
+  position: relative;
+}
+.hero-name:hover .glitch-text {
+  animation: glitch 0.4s steps(2) forwards;
+}
+@keyframes glitch {
+  0%   { text-shadow: none; clip-path: none; }
+  20%  { text-shadow: -3px 0 var(--pink); clip-path: inset(10% 0 70% 0); }
+  40%  { text-shadow: 3px 0 var(--teal); clip-path: inset(50% 0 30% 0); }
+  60%  { text-shadow: -2px 0 var(--violet); clip-path: inset(80% 0 5% 0); }
+  80%  { text-shadow: 2px 0 var(--teal); clip-path: none; }
+  100% { text-shadow: none; clip-path: none; }
+}
+
+/* ── NAV ACTIVE LINK ────────────────────────────────────────── */
+.nav-links a.active {
+  color: var(--teal);
+}
+.nav-links a.active::before {
+  content: '> ';
+  color: var(--teal);
+}
+
+/* ── MAGNETIC BUTTONS ───────────────────────────────────────── */
+.btn {
+  will-change: transform;
+  transition: background .2s, color .2s, transform .15s cubic-bezier(.4,0,.2,1),
+              box-shadow .2s;
+}
+.btn-primary:hover {
+  box-shadow: 0 0 20px rgba(0,255,209,.35), 0 0 40px rgba(0,255,209,.1);
+}
+.btn-ghost:hover {
+  box-shadow: 0 0 20px rgba(139,92,246,.3);
+}
+
+/* ── PROJECT CARD LIFT ──────────────────────────────────────── */
+.proj-terminal {
+  transition: border-color .25s, transform .25s cubic-bezier(.4,0,.2,1),
+              box-shadow .25s;
+}
+.proj-terminal:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0,255,209,.08);
+}
+
+/* ── TIMELINE DOT PULSE ─────────────────────────────────────── */
+.tl-item::before {
+  animation: dot-pulse 2.5s ease-in-out infinite;
+}
+@keyframes dot-pulse {
+  0%, 100% { box-shadow: none; }
+  50%       { box-shadow: 0 0 0 5px rgba(0,255,209,.15), 0 0 0 10px rgba(0,255,209,.05); }
+}
+
+/* ── PIPE NODE HOVER ────────────────────────────────────────── */
+.pipe-node {
+  transition: background .2s, color .2s, box-shadow .2s;
+}
+.pipe-node:hover {
+  background: rgba(0,255,209,.08);
+  box-shadow: 0 0 16px rgba(0,255,209,.25);
+}
+
+/* ── CONTACT LINK SLIDE ─────────────────────────────────────── */
+.c-link {
+  position: relative;
+  overflow: hidden;
+}
+.c-link::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 2px;
+  background: var(--teal);
+  transform: scaleY(0);
+  transition: transform .2s cubic-bezier(.4,0,.2,1);
+  transform-origin: bottom;
+}
+.c-link:hover::before { transform: scaleY(1); }
+
+/* ── HACKATHON CARD GLOW ────────────────────────────────────── */
+.hackathon-card {
+  transition: box-shadow .3s;
+}
+.hackathon-card:hover {
+  box-shadow: 0 0 30px rgba(139,92,246,.2), 0 0 60px rgba(139,92,246,.08);
+}
+
+/* ── SCROLL PROGRESS BAR ────────────────────────────────────── */
+#scroll-progress {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--teal), var(--violet));
+  z-index: 200;
+  box-shadow: 0 0 8px var(--teal);
+  transition: width .1s linear;
+}
 </style>
 </head>
 <body>
 
 <canvas id="canvas"></canvas>
+
+<!-- CUSTOM CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<!-- SCROLL PROGRESS -->
+<div id="scroll-progress"></div>
 
 <!-- NAV -->
 <nav>
@@ -329,7 +508,7 @@ footer span{color:var(--teal)}
     <div class="hero-inner">
       <div>
         <div class="hero-tag">// SYSTEM ONLINE — Cape Town, ZA</div>
-        <div class="hero-name">Gulian Ibrahim<span class="cursor"></span></div>
+        <div class="hero-name"><span class="glitch-text">Gulian Ibrahim</span><span class="cursor"></span></div>
         <div class="hero-role">Aspiring Data Engineer &amp; Software Developer</div>
         <p class="hero-bio">
           Building systems that move, transform, and expose data.
@@ -374,7 +553,7 @@ footer span{color:var(--teal)}
 </div>
 
 <!-- SKILLS -->
-<section id="skills">
+<section id="skills" class="reveal">
   <div class="container">
     <div class="section-label">// CAPABILITY MATRIX</div>
     <h2 class="section-heading">Technical Stack</h2>
@@ -391,7 +570,7 @@ footer span{color:var(--teal)}
 </section>
 
 <!-- PROJECTS -->
-<section id="projects">
+<section id="projects" class="reveal">
   <div class="container">
     <div class="section-label">// PROJECT LOG</div>
     <h2 class="section-heading">Selected Work</h2>
@@ -523,7 +702,7 @@ footer span{color:var(--teal)}
 </section>
 
 <!-- EXPERIENCE -->
-<section id="experience">
+<section id="experience" class="reveal">
   <div class="container">
     <div class="section-label">// CAREER &amp; EDUCATION LOG</div>
     <h2 class="section-heading">Experience</h2>
@@ -585,7 +764,7 @@ footer span{color:var(--teal)}
 </section>
 
 <!-- CONTACT -->
-<section id="contact">
+<section id="contact" class="reveal">
   <div class="container">
     <div class="section-label">// ESTABLISH CONNECTION</div>
     <h2 class="section-heading">Contact</h2>
@@ -835,6 +1014,115 @@ footer span{color:var(--teal)}
     requestAnimationFrame(drawSkillGraph);
   }
   drawSkillGraph();
+})();
+
+/* ── CUSTOM CURSOR ────────────────────────────────────────── */
+(function(){
+  const dot  = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  if (!dot || !ring) return;
+
+  // Ring follows with lag via lerp
+  let ringX = 0, ringY = 0;
+  let mouseX = 0, mouseY = 0;
+
+  document.addEventListener('mousemove', e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    dot.style.left = mouseX + 'px';
+    dot.style.top  = mouseY + 'px';
+  });
+
+  (function lerpRing(){
+    ringX += (mouseX - ringX) * 0.12;
+    ringY += (mouseY - ringY) * 0.12;
+    ring.style.left = ringX + 'px';
+    ring.style.top  = ringY + 'px';
+    requestAnimationFrame(lerpRing);
+  })();
+
+  // Hover state on interactive elements
+  const hoverTargets = 'a, button, .btn, .proj-terminal, .c-link, .nav-links a, .pipe-node';
+  document.querySelectorAll(hoverTargets).forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  // Click flash
+  document.addEventListener('mousedown', () => {
+    document.body.classList.add('cursor-click');
+    setTimeout(() => document.body.classList.remove('cursor-click'), 150);
+  });
+
+  // Hide cursor when it leaves window
+  document.addEventListener('mouseleave', () => {
+    dot.style.opacity  = '0';
+    ring.style.opacity = '0';
+  });
+  document.addEventListener('mouseenter', () => {
+    dot.style.opacity  = '';
+    ring.style.opacity = '';
+  });
+})();
+
+/* ── SCROLL PROGRESS BAR ──────────────────────────────────── */
+(function(){
+  const bar = document.getElementById('scroll-progress');
+  if (!bar) return;
+  window.addEventListener('scroll', () => {
+    const scrolled = window.scrollY;
+    const total    = document.documentElement.scrollHeight - window.innerHeight;
+    bar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
+  }, { passive: true });
+})();
+
+/* ── SECTION REVEAL ON SCROLL ─────────────────────────────── */
+(function(){
+  const reveals = document.querySelectorAll('.reveal');
+  if (!reveals.length) return;
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => obs.observe(el));
+})();
+
+/* ── ACTIVE NAV LINK ON SCROLL ────────────────────────────── */
+(function(){
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+  if (!sections.length || !navLinks.length) return;
+
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
+        if (active) active.classList.add('active');
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(s => obs.observe(s));
+})();
+
+/* ── MAGNETIC BUTTON EFFECT ───────────────────────────────── */
+(function(){
+  document.querySelectorAll('.btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r   = btn.getBoundingClientRect();
+      const dx  = e.clientX - (r.left + r.width  / 2);
+      const dy  = e.clientY - (r.top  + r.height / 2);
+      btn.style.transform = `translate(${dx * 0.18}px, ${dy * 0.18}px)`;
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+  });
 })();
 </script>
 </body>
