@@ -2,9 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<link rel="icon" type="image/png" href="ag-favicon.png">
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Gulian Ibrahim // Data Engineer</title>
+<meta name="description" content="Building systems that move, transform, and expose data. Currently studying Computing at STADIO; previously shipped real IT operations solo at Legates Group. Competes in hackathons, writes code, makes music on the side."/>
+<meta name="keywords" content="Gulian Ibrahim, AgCat80, Computing Minds, data engineer, data engineering, aspiring data engineer, software developer, software engineering, IT support, data pipelines, ETL, Python, C#, ASP.NET, SQL, MySQL, Java, JavaScript, C++, Git, Cape Town, South Africa, STADIO, Eduvos, Entelect HackIT 2026, Photospheria Solver, ScreenRand, Hangman, Tinkercad Electronics, portfolio"/>
+<meta property="og:title" content="Gulian Ibrahim — Data Engineer Portfolio"/>
+<meta property="og:description" content="Building systems that move, transform, and expose data. Currently studying Computing at STADIO; previously shipped real IT operations solo at Legates Group. Competes in hackathons, writes code, makes music on the side."/>
+<meta property="og:url" content="https://agcat80.github.io/portfolio-website"/>
+<meta property="og:type" content="website"/>
+<meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:title" content="Gulian Ibrahim — Data Engineer Portfolio"/>
+<meta name="twitter:description" content="Building systems that move, transform, and expose data. Currently studying Computing at STADIO; previously shipped real IT operations solo at Legates Group. Competes in hackathons, writes code, makes music on the side."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -31,6 +39,20 @@ body{background:var(--void);color:var(--text);font-family:var(--sans);
 a{color:var(--teal);text-decoration:none}
 a:hover{text-decoration:underline}
 img{max-width:100%}
+section{scroll-margin-top:80px}
+
+/* ── CINEMATIC LOADER ───────────────────────────────────────── */
+#loading-screen{
+  position:fixed;inset:0;z-index:2000;display:grid;place-items:center;
+  background:#02080d;color:var(--teal);font-family:var(--mono);
+  letter-spacing:.12em;transition:opacity .45s ease,visibility .45s ease;
+}
+#loading-screen.is-done{opacity:0;visibility:hidden;pointer-events:none}
+.loader-copy{font-size:.8rem;text-align:center}
+.loader-progress{position:absolute;inset:auto 0 0;height:2px;background:rgba(0,255,209,.13)}
+.loader-progress span{display:block;width:0;height:100%;background:var(--teal);
+  box-shadow:0 0 14px var(--teal);animation:loader-fill 2.5s linear forwards}
+@keyframes loader-fill{to{width:100%}}
 
 /* ── SCANLINES OVERLAY ──────────────────────────────────────── */
 body::before{
@@ -61,8 +83,15 @@ nav{
 .nav-logo span{color:var(--dim)}
 .nav-links{display:flex;gap:2rem;list-style:none}
 .nav-links a{font-family:var(--mono);font-size:.75rem;color:var(--dim);
-             letter-spacing:.06em;transition:color .2s}
+             letter-spacing:.06em;transition:color .2s,transform .18s ease}
 .nav-links a:hover{color:var(--teal);text-decoration:none}
+.nav-links a.active{color:var(--teal)}
+.nav-indicator{
+  position:absolute;left:0;bottom:.45rem;width:0;height:2px;
+  background:var(--teal);box-shadow:0 0 8px rgba(0,255,209,.55);
+  transform:translateX(0);transition:transform .28s ease,width .28s ease;
+  pointer-events:none;
+}
 
 /* ── HERO ───────────────────────────────────────────────────── */
 #hero{
@@ -89,6 +118,11 @@ nav{
   font-family:var(--sans);font-size:1.1rem;font-weight:300;
   color:var(--violet);margin-bottom:2rem;letter-spacing:.02em;
 }
+.type-cursor{
+  display:inline-block;width:1px;height:1.1em;margin-left:3px;
+  background:var(--violet);vertical-align:middle;animation:blink .8s step-end infinite;
+}
+.type-cursor.is-hidden{display:none}
 .hero-bio{
   font-size:.95rem;color:var(--dim);max-width:45ch;line-height:1.8;
   margin-bottom:2.5rem;
@@ -171,6 +205,16 @@ nav{
 .skill-tag.pink{border-color:var(--pink);color:var(--pink)}
 .skill-tag.gold{border-color:#F59E0B;color:#F59E0B}
 
+/* ── EXPERIENCE COUNTERS ────────────────────────────────────── */
+.stats-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:1rem;margin:0 0 3rem}
+.stat-card{padding:1.2rem 1.35rem;background:var(--surface);
+  border:1px solid var(--border);text-align:center}
+.stat-value{display:block;font-family:var(--mono);font-size:clamp(1.5rem,3vw,2rem);
+  font-weight:700;line-height:1.2;color:var(--teal)}
+.stat-label{display:block;margin-top:.4rem;font-family:var(--mono);
+  font-size:.65rem;letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
+
 /* ── PIPELINE DIVIDER ───────────────────────────────────────── */
 .pipeline{
   display:flex;align-items:center;gap:0;
@@ -199,9 +243,17 @@ nav{
 #projects{border-bottom:1px solid var(--border)}
 .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1.5rem}
 .proj-terminal{
+  position:relative;overflow:hidden;transform-style:preserve-3d;
   background:var(--surface);border:1px solid var(--border);
-  transition:border-color .25s;
+  transition:border-color .25s,transform .18s ease;
+  will-change:transform;
 }
+.proj-terminal::after{
+  content:"";position:absolute;inset:0;z-index:2;pointer-events:none;opacity:0;
+  background:radial-gradient(circle at var(--glare-x,50%) var(--glare-y,50%),
+    rgba(255,255,255,.09),transparent 42%);transition:opacity .2s ease;
+}
+.proj-terminal:hover::after{opacity:1}
 .proj-terminal:hover{border-color:var(--teal)}
 .proj-bar{
   background:var(--panel);padding:.55rem 1rem;
@@ -267,6 +319,17 @@ nav{
   background:var(--surface);border:1px solid var(--border);
   font-family:var(--mono);font-size:.82rem;
 }
+.contact-terminal .term-body{max-height:300px;overflow-y:auto;min-height:190px}
+.terminal-input-row{display:flex;align-items:center;gap:.6rem;padding:.75rem 1rem;
+  border-top:1px solid var(--border);background:rgba(0,0,0,.12)}
+.terminal-input-row .prompt{color:var(--teal);font-family:var(--mono)}
+#terminal-command{min-width:0;flex:1;border:0;outline:0;background:transparent;
+  color:#fff;font:inherit;caret-color:var(--teal)}
+#terminal-command:focus-visible{outline:1px solid var(--teal);outline-offset:4px}
+.terminal-hint{padding:0 1rem .8rem;color:var(--dim);font-family:var(--mono);
+  font-size:.62rem}
+.terminal-output-line{white-space:pre-wrap;overflow-wrap:anywhere}
+.terminal-output-line.is-error{color:var(--pink)}
 .contact-links{display:flex;flex-direction:column;gap:1rem;padding-top:.5rem}
 .c-link{
   display:flex;align-items:center;gap:1rem;padding:.9rem 1rem;
@@ -275,12 +338,44 @@ nav{
 }
 .c-link:hover{border-color:var(--teal);background:rgba(0,255,209,.04);
               color:var(--teal);text-decoration:none}
+.c-link.youtube-link:hover{border-color:var(--pink);background:rgba(255,45,107,.05);
+                           color:var(--pink)}
+.youtube-link:hover .c-icon,.youtube-link:hover .c-label{color:var(--pink)}
 .c-icon{width:32px;text-align:center;font-size:1.1rem;flex-shrink:0}
 .c-label{font-family:var(--mono);font-size:.78rem}
 .c-label small{display:block;font-size:.65rem;color:var(--dim);margin-top:.1rem}
 .contact-form-note{
   font-size:.85rem;color:var(--dim);line-height:1.7;margin-top:1.5rem;
 }
+
+/* ── ENTRANCES, TOAST & BACK TO TOP ──────────────────────────── */
+[data-reveal]{
+  opacity:0;transform:translateY(18px);
+  transition:opacity .6s ease,transform .6s cubic-bezier(.2,.7,.2,1);
+  transition-delay:var(--reveal-delay,0ms);
+}
+[data-reveal].is-visible{opacity:1;transform:translateY(0)}
+.back-to-top{
+  position:fixed;right:1.5rem;bottom:1.5rem;z-index:150;
+  width:42px;height:42px;border:1px solid var(--teal);border-radius:0;
+  background:var(--surface);color:var(--teal);font:1.1rem var(--mono);
+  opacity:0;visibility:hidden;transform:scale(.85);
+  transition:opacity .2s ease,visibility .2s ease,transform .2s ease;cursor:pointer;
+}
+.back-to-top.is-visible{opacity:1;visibility:visible;transform:scale(1)}
+.back-to-top:hover{background:var(--teal);color:var(--void)}
+.toast{
+  position:fixed;right:1.5rem;bottom:5rem;z-index:180;
+  padding:.7rem 1rem;border:1px solid var(--teal);background:var(--surface);
+  color:var(--teal);font: .72rem var(--mono);opacity:0;
+  transform:translateY(8px);pointer-events:none;transition:opacity .2s,transform .2s;
+}
+.toast.is-visible{opacity:1;transform:translateY(0)}
+.back-top-sentinel{position:absolute;top:400px;left:0;width:1px;height:1px;
+  pointer-events:none}
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;
+  white-space:nowrap!important;border:0!important}
 
 /* ── FOOTER ──────────────────────────────────────────────────── */
 footer{
@@ -298,196 +393,67 @@ footer span{color:var(--teal)}
   .hackathon-card{grid-template-columns:1fr}
   .hero-terminal{display:none}
   .nav-links{display:none}
+  .stats-grid{gap:.5rem}
+  .stat-card{padding:1rem .45rem}
+  .stat-label{font-size:.56rem}
+  .back-to-top{right:1rem;bottom:1rem}
+  .toast{right:1rem;bottom:4.5rem}
 }
 
 /* ── REDUCED MOTION ─────────────────────────────────────────── */
 @media(prefers-reduced-motion:reduce){
   *{animation:none!important;transition:none!important}
+  [data-reveal]{opacity:1;transform:none}
 }
 
-/* ── CUSTOM CURSOR ──────────────────────────────────────────── */
-body { cursor: none; }
-a, button, .btn, .proj-terminal, .c-link, .nav-links a { cursor: none; }
-
-#cursor-dot {
-  position: fixed;
-  top: 0; left: 0;
-  width: 6px; height: 6px;
-  background: var(--teal);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  box-shadow: 0 0 10px var(--teal), 0 0 20px rgba(0,255,209,.4);
-  transition: width .15s, height .15s, background .2s;
-}
-
-#cursor-ring {
-  position: fixed;
-  top: 0; left: 0;
-  width: 32px; height: 32px;
-  border: 1px solid var(--teal);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  transform: translate(-50%, -50%);
-  opacity: 0.5;
-  transition: width .35s cubic-bezier(.4,0,.2,1),
-              height .35s cubic-bezier(.4,0,.2,1),
-              opacity .35s,
-              border-color .2s;
-}
-
-body.cursor-hover #cursor-dot {
-  width: 10px; height: 10px;
-  background: var(--violet);
-  box-shadow: 0 0 14px var(--violet), 0 0 28px rgba(139,92,246,.5);
-}
-
-body.cursor-hover #cursor-ring {
-  width: 50px; height: 50px;
-  border-color: var(--violet);
-  opacity: 0.35;
-}
-
-body.cursor-click #cursor-dot {
-  width: 4px; height: 4px;
-  background: var(--pink);
-  box-shadow: 0 0 20px var(--pink);
-}
-
-body.cursor-click #cursor-ring {
-  width: 20px; height: 20px;
-  border-color: var(--pink);
-  opacity: 0.9;
-}
-
-/* ── SECTION REVEAL ─────────────────────────────────────────── */
-.reveal {
-  opacity: 0;
-  transform: translateY(28px);
-  transition: opacity .7s cubic-bezier(.4,0,.2,1),
-              transform .7s cubic-bezier(.4,0,.2,1);
-}
-.reveal.visible {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ── GLITCH ON HERO NAME ────────────────────────────────────── */
-.hero-name {
-  position: relative;
-}
-.hero-name:hover .glitch-text {
-  animation: glitch 0.4s steps(2) forwards;
-}
-@keyframes glitch {
-  0%   { text-shadow: none; clip-path: none; }
-  20%  { text-shadow: -3px 0 var(--pink); clip-path: inset(10% 0 70% 0); }
-  40%  { text-shadow: 3px 0 var(--teal); clip-path: inset(50% 0 30% 0); }
-  60%  { text-shadow: -2px 0 var(--violet); clip-path: inset(80% 0 5% 0); }
-  80%  { text-shadow: 2px 0 var(--teal); clip-path: none; }
-  100% { text-shadow: none; clip-path: none; }
-}
-
-/* ── NAV ACTIVE LINK ────────────────────────────────────────── */
-.nav-links a.active {
-  color: var(--teal);
-}
-.nav-links a.active::before {
-  content: '> ';
-  color: var(--teal);
-}
-
-/* ── MAGNETIC BUTTONS ───────────────────────────────────────── */
-.btn {
-  will-change: transform;
-  transition: background .2s, color .2s, transform .15s cubic-bezier(.4,0,.2,1),
-              box-shadow .2s;
-}
-.btn-primary:hover {
-  box-shadow: 0 0 20px rgba(0,255,209,.35), 0 0 40px rgba(0,255,209,.1);
-}
-.btn-ghost:hover {
-  box-shadow: 0 0 20px rgba(139,92,246,.3);
-}
-
-/* ── PROJECT CARD LIFT ──────────────────────────────────────── */
-.proj-terminal {
-  transition: border-color .25s, transform .25s cubic-bezier(.4,0,.2,1),
-              box-shadow .25s;
-}
-.proj-terminal:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 12px 40px rgba(0,255,209,.08);
-}
-
-/* ── TIMELINE DOT PULSE ─────────────────────────────────────── */
-.tl-item::before {
-  animation: dot-pulse 2.5s ease-in-out infinite;
-}
-@keyframes dot-pulse {
-  0%, 100% { box-shadow: none; }
-  50%       { box-shadow: 0 0 0 5px rgba(0,255,209,.15), 0 0 0 10px rgba(0,255,209,.05); }
-}
-
-/* ── PIPE NODE HOVER ────────────────────────────────────────── */
-.pipe-node {
-  transition: background .2s, color .2s, box-shadow .2s;
-}
-.pipe-node:hover {
-  background: rgba(0,255,209,.08);
-  box-shadow: 0 0 16px rgba(0,255,209,.25);
-}
-
-/* ── CONTACT LINK SLIDE ─────────────────────────────────────── */
-.c-link {
-  position: relative;
-  overflow: hidden;
-}
-.c-link::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 2px;
-  background: var(--teal);
-  transform: scaleY(0);
-  transition: transform .2s cubic-bezier(.4,0,.2,1);
-  transform-origin: bottom;
-}
-.c-link:hover::before { transform: scaleY(1); }
-
-/* ── HACKATHON CARD GLOW ────────────────────────────────────── */
-.hackathon-card {
-  transition: box-shadow .3s;
-}
-.hackathon-card:hover {
-  box-shadow: 0 0 30px rgba(139,92,246,.2), 0 0 60px rgba(139,92,246,.08);
-}
-
-/* ── SCROLL PROGRESS BAR ────────────────────────────────────── */
-#scroll-progress {
-  position: fixed;
-  top: 0; left: 0;
-  height: 2px;
-  width: 0%;
-  background: linear-gradient(90deg, var(--teal), var(--violet));
-  z-index: 200;
-  box-shadow: 0 0 8px var(--teal);
-  transition: width .1s linear;
+/* ── PRINT ──────────────────────────────────────────────────── */
+@media print{
+  *,*::before,*::after{
+    animation:none!important;transition:none!important;box-shadow:none!important;
+    text-shadow:none!important;filter:none!important;
+  }
+  html,body,.page,section,nav,footer{background:#fff!important;color:#000!important}
+  body{overflow:visible!important}
+  nav,#canvas,#skill-canvas,.cursor,.type-cursor,#scroll-progress,
+  .back-to-top,.toast,#loading-screen{display:none!important}
+  body,body *{background-color:#fff!important;color:#000!important;border-color:#bbb!important}
+  .page{z-index:auto}
+  #hero{min-height:auto}
+  section{padding:1.5rem 0;border-color:#ccc!important;break-inside:auto}
+  .container{max-width:none;padding:0 1.2cm}
+  .hero-inner,.skills-wrap,.contact-grid,.projects-grid,.hackathon-card,.skill-legend{display:block!important}
+  .hero-terminal,.contact-terminal,.proj-terminal,.hackathon-card,.stat-card,
+  #skill-canvas-wrap{background:#fff!important;border:1px solid #bbb!important;
+    color:#000!important;break-inside:avoid}
+  .hero-terminal{display:block!important}
+  .section-heading,.hero-name,.hero-role,.hero-bio,.section-sub,.section-label,
+  .tl-title,.tl-period,.tl-org,.tl-desc,.proj-title,.proj-desc,.proj-link,
+  .hack-rank,.hack-info h3,.hack-info p,.hack-score,.c-link,.c-label,
+  .contact-form-note,footer,footer span,.stat-value,.stat-label{
+    color:#000!important
+  }
+  .proj-terminal,.tl-item,.skill-item,.c-link{break-inside:avoid}
+  .proj-terminal{margin-bottom:1rem;transform:none!important}
+  .proj-terminal::after{display:none!important}
+  .c-link,.proj-link{border-color:#888!important}
+  a{color:#000!important;text-decoration:underline}
+  [data-reveal]{opacity:1!important;transform:none!important}
+  .skill-fill{width:var(--print-width,100%)!important;background:#333!important}
+  .term-body{min-height:0!important;max-height:none!important}
+  .terminal-input-row{display:none!important}
+  .contact-grid{display:block!important}
+  .pipeline{flex-wrap:wrap;gap:.4rem;overflow:visible}
 }
 </style>
 </head>
 <body>
 
+<div id="loading-screen" role="status" aria-live="polite">
+  <div class="loader-copy">INITIALISING SYSTEM...</div>
+  <div class="loader-progress" aria-hidden="true"><span></span></div>
+</div>
+<div class="back-top-sentinel" id="back-top-sentinel" aria-hidden="true"></div>
 <canvas id="canvas"></canvas>
-
-<!-- CUSTOM CURSOR -->
-<div id="cursor-dot"></div>
-<div id="cursor-ring"></div>
-
-<!-- SCROLL PROGRESS -->
-<div id="scroll-progress"></div>
 
 <!-- NAV -->
 <nav>
@@ -498,6 +464,7 @@ body.cursor-click #cursor-ring {
     <li><a href="#experience">experience</a></li>
     <li><a href="#contact">contact</a></li>
   </ul>
+  <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
 </nav>
 
 <div class="page">
@@ -508,8 +475,11 @@ body.cursor-click #cursor-ring {
     <div class="hero-inner">
       <div>
         <div class="hero-tag">// SYSTEM ONLINE — Cape Town, ZA</div>
-        <div class="hero-name"><span class="glitch-text">Gulian Ibrahim</span><span class="cursor"></span></div>
-        <div class="hero-role">Aspiring Data Engineer &amp; Software Developer</div>
+        <div class="hero-name">Gulian Ibrahim<span class="cursor"></span></div>
+        <div class="hero-role" id="hero-role">
+          <span class="role-text">Aspiring Data Engineer &amp; Software Developer</span>
+          <span class="type-cursor" aria-hidden="true"></span>
+        </div>
         <p class="hero-bio">
           Building systems that move, transform, and expose data.
           Currently studying Computing at STADIO; previously shipped
@@ -553,7 +523,7 @@ body.cursor-click #cursor-ring {
 </div>
 
 <!-- SKILLS -->
-<section id="skills" class="reveal">
+<section id="skills">
   <div class="container">
     <div class="section-label">// CAPABILITY MATRIX</div>
     <h2 class="section-heading">Technical Stack</h2>
@@ -570,7 +540,7 @@ body.cursor-click #cursor-ring {
 </section>
 
 <!-- PROJECTS -->
-<section id="projects" class="reveal">
+<section id="projects">
   <div class="container">
     <div class="section-label">// PROJECT LOG</div>
     <h2 class="section-heading">Selected Work</h2>
@@ -702,19 +672,34 @@ body.cursor-click #cursor-ring {
 </section>
 
 <!-- EXPERIENCE -->
-<section id="experience" class="reveal">
+<section id="experience">
   <div class="container">
     <div class="section-label">// CAREER &amp; EDUCATION LOG</div>
     <h2 class="section-heading">Experience</h2>
     <p class="section-sub">Professional history and academic background.</p>
+
+    <div class="stats-grid" aria-label="Career statistics">
+      <div class="stat-card">
+        <span class="stat-value" data-counter data-target="990" data-suffix="+">0</span>
+        <span class="stat-label">HackIT Competitors</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" data-counter data-target="124" data-prefix="#">0</span>
+        <span class="stat-label">Ranking Achieved</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-value" data-counter data-target="2" data-suffix=" YRS">0</span>
+        <span class="stat-label">IT Experience</span>
+      </div>
+    </div>
 
     <div class="timeline">
       <div class="tl-item">
         <div class="tl-period">2026 — PRESENT</div>
         <div class="tl-title">Bachelor's Degree in Computing</div>
         <div class="tl-org">STADIO Higher Education</div>
-        <p class="tl-desc">Full computing degree with a long-term focus on data engineering. Covers software architecture, databases, algorithms and systems design.</p>
-        <div class="tl-tags"><span class="tag">Computing</span><span class="tag">Data Engineering</span></div>
+        <p class="tl-desc">Full computing degree with a long-term focus on data engineering. Covers software architecture, databases, algorithms and systems design. Completed first semester with distinctions across all modules — Computational Thinking &amp; Programming (97%), Introduction to Databases (92%), Software Engineering (88%).</p>
+        <div class="tl-tags"><span class="tag">Computing</span><span class="tag">Data Engineering</span><span class="tag">97% — Programming</span><span class="tag">92% — Databases</span><span class="tag">88% — Software Engineering</span></div>
       </div>
 
       <div class="tl-item">
@@ -764,7 +749,7 @@ body.cursor-click #cursor-ring {
 </section>
 
 <!-- CONTACT -->
-<section id="contact" class="reveal">
+<section id="contact">
   <div class="container">
     <div class="section-label">// ESTABLISH CONNECTION</div>
     <h2 class="section-heading">Contact</h2>
@@ -778,7 +763,7 @@ body.cursor-click #cursor-ring {
           <div class="dot dot-g"></div>
           <span class="term-title">contact.sh</span>
         </div>
-        <div class="term-body">
+        <div class="term-body" id="contact-output" role="log" aria-live="polite" aria-relevant="additions">
           <div class="term-line"><span class="prompt">&gt; </span><span class="cmd">whoami</span></div>
           <div class="term-line"><span class="out">Gulian Ibrahim — Cape Town, ZA</span></div>
           <br/>
@@ -790,6 +775,14 @@ body.cursor-click #cursor-ring {
           <div class="term-line"><span class="prompt">&gt; </span><span class="cmd">echo $TARGET_ROLE</span></div>
           <div class="term-line"><span class="out">Data Engineer / IT Support / Systems Dev</span></div>
         </div>
+        <form class="terminal-input-row" id="terminal-form" autocomplete="off">
+          <label class="visually-hidden" for="terminal-command">Enter a terminal command</label>
+          <span class="prompt" aria-hidden="true">&gt;</span>
+          <input id="terminal-command" name="command" type="text" spellcheck="false"
+            autocomplete="off" autocapitalize="off" aria-describedby="terminal-hint">
+          <span class="type-cursor" aria-hidden="true"></span>
+        </form>
+        <p class="terminal-hint" id="terminal-hint">Try: whoami · ls projects/ · contact · skills · status · clear</p>
       </div>
 
       <div>
@@ -810,6 +803,10 @@ body.cursor-click #cursor-ring {
             <div class="c-icon">◉</div>
             <div class="c-label">+27 69 340 9750<small>WhatsApp</small></div>
           </a>
+          <a class="c-link youtube-link" href="https://www.youtube.com/@Isaac_rejoice" target="_blank" rel="noopener">
+            <div class="c-icon">▶</div>
+            <div class="c-label">youtube.com/@Isaac_rejoice<small>YouTube — Computing Minds</small></div>
+          </a>
         </div>
         <p class="contact-form-note">
           For quick responses, WhatsApp or LinkedIn direct message is preferred.
@@ -826,15 +823,25 @@ body.cursor-click #cursor-ring {
 
 </div><!-- .page -->
 
+<button class="back-to-top" id="back-to-top" type="button" aria-label="Back to top" aria-hidden="true" tabindex="-1">↑</button>
+<div class="toast" id="shortcut-toast" role="status" aria-live="polite">// Access granted, AgCat80</div>
+
 <script>
 /* ── PARTICLE CANVAS ──────────────────────────────────────── */
 (function(){
   const canvas=document.getElementById('canvas');
+  if(!canvas)return;
   const ctx=canvas.getContext('2d');
-  let W,H,particles=[];
+  let W,H,particles=[],matrixDrops=[],matrixUntil=0;
+  const mouse={x:-1000,y:-1000};
 
-  function resize(){W=canvas.width=innerWidth;H=canvas.height=innerHeight}
+  function resize(){
+    W=canvas.width=innerWidth;H=canvas.height=innerHeight;
+    matrixDrops=Array.from({length:Math.ceil(W/16)},()=>Math.random()*-80);
+  }
   resize();window.addEventListener('resize',()=>{resize();init()});
+  window.addEventListener('pointermove',event=>{mouse.x=event.clientX;mouse.y=event.clientY},{passive:true});
+  window.addEventListener('pointerleave',()=>{mouse.x=-1000;mouse.y=-1000});
 
   function rand(a,b){return a+Math.random()*(b-a)}
 
@@ -843,32 +850,65 @@ body.cursor-click #cursor-ring {
     reset(){
       this.x=rand(0,W);
       this.y=rand(0,H);
-      this.vx=rand(-0.4,0.4);
-      this.vy=rand(0.2,0.8);
+      this.shape=Math.random()<.34?'orb':'stream';
+      this.vx=this.shape==='orb'?rand(-.18,.18):rand(-.4,.4);
+      this.vy=this.shape==='orb'?rand(-.12,.12):rand(.2,.8);
       this.size=rand(1,2.5);
       this.life=rand(0.3,1);
       this.color=Math.random()<0.6?'#00FFD1':Math.random()<0.5?'#8B5CF6':'#FF2D6B';
+      this.flash=0;
     }
     update(){
-      this.x+=this.vx;this.y+=this.vy;this.life-=0.002;
-      if(this.life<=0||this.y>H)this.reset();
+      const dx=this.x-mouse.x,dy=this.y-mouse.y,distance=Math.hypot(dx,dy);
+      if(distance<120&&distance>0){
+        const force=(120-distance)/120*.018;
+        this.vx+=(dx/distance)*force;this.vy+=(dy/distance)*force;
+      }
+      this.vx*=.998;this.vy*=.998;
+      this.x+=this.vx;this.y+=this.vy;this.life-=.0012;
+      if(Math.random()<.00012)this.flash=.18;
+      this.flash=Math.max(0,this.flash-.012);
+      if(this.life<=0||this.y>H+10||this.x<-10||this.x>W+10)this.reset();
+      if(this.shape==='orb'&&this.y< -10)this.y=H+10;
     }
     draw(){
-      ctx.globalAlpha=this.life*0.6;
-      ctx.fillStyle=this.color;
-      ctx.shadowColor=this.color;
-      ctx.shadowBlur=6;
-      ctx.fillRect(this.x,this.y,this.size,this.size*3);
+      ctx.globalAlpha=this.flash>0?1:this.life*.6;
+      ctx.fillStyle=this.flash>0?'#ffffff':this.color;
+      ctx.shadowColor=this.flash>0?'#ffffff':this.color;
+      ctx.shadowBlur=this.flash>0?13:6;
+      if(this.shape==='orb'){
+        ctx.beginPath();ctx.arc(this.x,this.y,this.size*1.3,0,Math.PI*2);ctx.fill();
+      }else{
+        ctx.fillRect(this.x,this.y,this.size,this.size*3);
+      }
+      ctx.globalAlpha=1;ctx.shadowBlur=0;
     }
   }
 
   function init(){particles=[];for(let i=0;i<120;i++)particles.push(new Particle())}
   init();
 
+  const matrixChars='01アイウエオカキクケコサシスセソ';
+  function drawMatrix(){
+    ctx.fillStyle='rgba(4,13,20,.22)';ctx.fillRect(0,0,W,H);
+    ctx.font='13px monospace';
+    matrixDrops.forEach((drop,index)=>{
+      const char=matrixChars[Math.floor(Math.random()*matrixChars.length)];
+      ctx.fillStyle=Math.random()>.94?'#d5fff4':'#00ff66';
+      ctx.fillText(char,index*16,drop*16);
+      if(drop*16>H&&Math.random()>.975)matrixDrops[index]=0;
+      else matrixDrops[index]=drop+1;
+    });
+  }
+  window.triggerMatrixRain=()=>{matrixUntil=performance.now()+3000};
+
   function loop(){
-    ctx.clearRect(0,0,W,H);
-    ctx.shadowBlur=0;
-    particles.forEach(p=>{p.update();p.draw()});
+    if(performance.now()<matrixUntil){
+      drawMatrix();
+    }else{
+      ctx.clearRect(0,0,W,H);ctx.shadowBlur=0;
+      particles.forEach(p=>{p.update();p.draw()});
+    }
     requestAnimationFrame(loop);
   }
   loop();
@@ -883,6 +923,7 @@ body.cursor-click #cursor-ring {
     {type:'ok', text:'> [OK] Software Engineering Module loaded',delay:900},
     {type:'ok', text:'> [OK] Data Pipeline Layer online',delay:1200},
     {type:'ok', text:'> [OK] Python runtime detected (3.11)',delay:1500},
+    {type:'ok', text:'> [OK] YouTube channel detected — Computing Minds',delay:1650},
     {type:'ok', text:'> [OK] C# ASP.NET runtime detected',delay:1800},
     {type:'warn',text:'> [INFO] Hackathon mode: previously engaged',delay:2100},
     {type:'ok', text:'> [OK] Golden Key member — top 15% cohort',delay:2400},
@@ -913,13 +954,14 @@ body.cursor-click #cursor-ring {
 (function(){
   const skills=[
     {name:'C#  /  ASP.NET',pct:85,color:'teal',tags:['Backend','Web','OOP']},
-    {name:'Python',pct:80,color:'violet',tags:['Scripting','Data','Automation']},
-    {name:'SQL  /  Databases',pct:82,color:'teal',tags:['MySQL','SQL Server','Design']},
+    {name:'Python',pct:90,color:'violet',tags:['Scripting','Data','Automation']},
+    {name:'SQL  /  MySQL  /  Databases',pct:92,color:'teal',tags:['MySQL','SQL Server','Design']},
+    {name:'Software Engineering',pct:88,color:'violet',tags:['Architecture','SDLC','Design Patterns']},
     {name:'Java',pct:70,color:'pink',tags:['OOP','Console Apps']},
     {name:'JavaScript  /  Web',pct:65,color:'gold',tags:['HTML','CSS','DOM']},
     {name:'C++',pct:55,color:'pink',tags:['Embedded','Tinkercad']},
     {name:'Git  /  GitHub',pct:75,color:'violet',tags:['Version Control','CI']},
-    {name:'Data Engineering',pct:50,color:'teal',tags:['ETL','Pipelines','Goal']},
+    {name:'Data Engineering',pct:55,color:'teal',tags:['ETL','Pipelines','Goal']},
   ];
 
   // Render legend
@@ -932,7 +974,7 @@ body.cursor-click #cursor-ring {
         <span class="skill-pct">${s.pct}%</span>
       </div>
       <div class="skill-bar">
-        <div class="skill-fill ${s.color}" data-pct="${s.pct}" style="width:0"></div>
+        <div class="skill-fill ${s.color}" data-pct="${s.pct}" style="width:0;--print-width:${s.pct}%"></div>
       </div>
       <div style="margin-top:.4rem">
         ${s.tags.map(t=>`<span class="skill-tag ${s.color}">${t}</span> `).join('')}
@@ -958,170 +1000,399 @@ body.cursor-click #cursor-ring {
   // Skill node canvas
   const canvas=document.getElementById('skill-canvas');
   const wrap=document.getElementById('skill-canvas-wrap');
-  canvas.width=wrap.offsetWidth;
-  canvas.height=wrap.offsetWidth;
+  if(!canvas||!wrap)return;
   const ctx=canvas.getContext('2d');
-  const cx=canvas.width/2,cy=canvas.height/2;
-
-  const nodes=[
-    {label:'C#',x:cx,y:cy-90,color:'#00FFD1',r:28},
-    {label:'Python',x:cx+85,y:cy-40,color:'#8B5CF6',r:24},
-    {label:'SQL',x:cx+70,y:cy+60,color:'#00FFD1',r:22},
-    {label:'Java',x:cx,y:cy+100,color:'#FF2D6B',r:20},
-    {label:'JS',x:cx-70,y:cy+60,color:'#F59E0B',r:18},
-    {label:'C++',x:cx-85,y:cy-40,color:'#FF2D6B',r:18},
-    {label:'Git',x:cx-40,y:cy-10,color:'#8B5CF6',r:16},
-    {label:'ETL',x:cx+40,y:cy-10,color:'#00FFD1',r:16},
-    {label:'Core',x:cx,y:cy,color:'#ffffff',r:12},
+  const baseNodes=[
+    {label:'C#',dx:0,dy:-90,color:'#00FFD1',r:28},
+    {label:'Python',dx:85,dy:-40,color:'#8B5CF6',r:28},
+    {label:'SQL',dx:70,dy:60,color:'#00FFD1',r:26},
+    {label:'SWE',dx:0,dy:105,color:'#8B5CF6',r:22},
+    {label:'Java',dx:-75,dy:55,color:'#FF2D6B',r:20},
+    {label:'JS',dx:-85,dy:-35,color:'#F59E0B',r:18},
+    {label:'C++',dx:-40,dy:-80,color:'#FF2D6B',r:16},
+    {label:'Git',dx:-40,dy:-10,color:'#8B5CF6',r:16},
+    {label:'ETL',dx:40,dy:-10,color:'#00FFD1',r:16},
+    {label:'Core',dx:0,dy:0,color:'#ffffff',r:12},
   ];
+  let nodes=[],scale=1,cx=0,cy=0;
   const edges=[[0,8],[1,8],[2,8],[3,8],[4,8],[5,8],[6,8],[7,8],
                [0,1],[1,2],[0,7],[2,3],[1,7],[0,6]];
-
-  let t=0;
+  let t=0,graphFramePending=false;
+  function relayout(){
+    const size=Math.max(220,wrap.clientWidth);
+    canvas.width=size;canvas.height=size;scale=size/440;cx=size/2;cy=size/2;
+    nodes=baseNodes.map((node,index)=>({
+      ...node,x:cx+node.dx*scale,y:cy+node.dy*scale,
+      r:Math.max(11,node.r*scale),phase:index*1.71,amp:2.2*scale,
+      drawX:cx+node.dx*scale,drawY:cy+node.dy*scale
+    }));
+    drawSkillGraph();
+  }
+  const pointer={x:-1000,y:-1000};
+  canvas.addEventListener('pointermove',event=>{
+    const rect=canvas.getBoundingClientRect();
+    pointer.x=(event.clientX-rect.left)*(canvas.width/rect.width);
+    pointer.y=(event.clientY-rect.top)*(canvas.height/rect.height);
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches)drawSkillGraph();
+  });
+  canvas.addEventListener('pointerleave',()=>{pointer.x=-1000;pointer.y=-1000});
+  if('ResizeObserver'in window)new ResizeObserver(relayout).observe(wrap);
+  else window.addEventListener('resize',relayout);
+  relayout();
   function drawSkillGraph(){
+    if(!nodes.length)return;
     ctx.clearRect(0,0,canvas.width,canvas.height);
+    const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    nodes.forEach(node=>{
+      const drift=reduceMotion?0:Math.sin(t*.7+node.phase)*node.amp;
+      node.drawX=node.x+drift;
+      node.drawY=node.y+(reduceMotion?0:Math.cos(t*.56+node.phase)*node.amp);
+    });
     // edges
     edges.forEach(([a,b])=>{
       const na=nodes[a],nb=nodes[b];
       ctx.beginPath();
-      ctx.moveTo(na.x,na.y);ctx.lineTo(nb.x,nb.y);
+      ctx.moveTo(na.drawX,na.drawY);ctx.lineTo(nb.drawX,nb.drawY);
       ctx.strokeStyle='rgba(255,255,255,.06)';
       ctx.lineWidth=1;ctx.stroke();
     });
     // pulse along edges
     edges.forEach(([a,b],i)=>{
       const na=nodes[a],nb=nodes[b];
-      const prog=(t*0.3+i*0.7)%1;
-      const px=na.x+(nb.x-na.x)*prog;
-      const py=na.y+(nb.y-na.y)*prog;
+      const prog=reduceMotion ? .5 : (t*.3+i*.7)%1;
+      const tail=Math.max(0,prog-.11);
+      const sx=na.drawX+(nb.drawX-na.drawX)*tail;
+      const sy=na.drawY+(nb.drawY-na.drawY)*tail;
+      const px=na.drawX+(nb.drawX-na.drawX)*prog;
+      const py=na.drawY+(nb.drawY-na.drawY)*prog;
+      ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(px,py);
+      ctx.strokeStyle=na.color;ctx.globalAlpha=.45;ctx.lineWidth=2;ctx.stroke();
       ctx.beginPath();ctx.arc(px,py,2.5,0,Math.PI*2);
-      ctx.fillStyle=na.color;ctx.globalAlpha=0.7;ctx.fill();ctx.globalAlpha=1;
+      ctx.fillStyle=na.color;ctx.globalAlpha=.85;ctx.fill();ctx.globalAlpha=1;
     });
     // nodes
     nodes.forEach(n=>{
-      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      const hovered=Math.hypot(pointer.x-n.drawX,pointer.y-n.drawY)<n.r+5;
+      const pulse=hovered&&!reduceMotion?Math.sin(t*6)*2.4:0;
+      const radius=n.r+(hovered?4+pulse:0);
+      ctx.beginPath();ctx.arc(n.drawX,n.drawY,radius,0,Math.PI*2);
       ctx.fillStyle=n.color+'18';ctx.fill();
-      ctx.beginPath();ctx.arc(n.x,n.y,n.r,0,Math.PI*2);
+      ctx.beginPath();ctx.arc(n.drawX,n.drawY,radius,0,Math.PI*2);
       ctx.strokeStyle=n.color;ctx.lineWidth=1.5;
-      ctx.shadowColor=n.color;ctx.shadowBlur=10;ctx.stroke();
+      ctx.shadowColor=n.color;ctx.shadowBlur=hovered?18:10;ctx.stroke();
       ctx.shadowBlur=0;
       ctx.fillStyle=n.label==='Core'?'#fff':n.color;
       ctx.font=`bold ${Math.max(9,n.r*0.55)}px 'Space Mono',monospace`;
       ctx.textAlign='center';ctx.textBaseline='middle';
-      ctx.fillText(n.label,n.x,n.y);
+      ctx.lineWidth=3;ctx.strokeStyle='rgba(4,13,20,.95)';
+      ctx.strokeText(n.label,n.drawX,n.drawY);
+      ctx.fillText(n.label,n.drawX,n.drawY);
     });
-    t+=0.015;
-    requestAnimationFrame(drawSkillGraph);
+    t+=reduceMotion?0:.015;
+    if(!reduceMotion&&!graphFramePending){
+      graphFramePending=true;
+      requestAnimationFrame(()=>{graphFramePending=false;drawSkillGraph()});
+    }
   }
-  drawSkillGraph();
 })();
 
-/* ── CUSTOM CURSOR ────────────────────────────────────────── */
+/* ── INTERACTIVE CONTACT TERMINAL ─────────────────────────── */
 (function(){
-  const dot  = document.getElementById('cursor-dot');
-  const ring = document.getElementById('cursor-ring');
-  if (!dot || !ring) return;
+  const output=document.getElementById('contact-output');
+  const form=document.getElementById('terminal-form');
+  const input=document.getElementById('terminal-command');
+  if(!output||!form||!input)return;
+  const bio='Building systems that move, transform, and expose data. Currently studying Computing at STADIO; previously shipped real IT operations solo at Legates Group. Competes in hackathons, writes code, makes music on the side.';
+  const projectNames=[
+    'ASP.NET Web Platform','Photospheria Solver','ScreenRand',
+    'Hangman + Word Puzzle','Tinkercad Electronics','Data Pipeline Scripts'
+  ];
+  const skillLines=[
+    'C# / ASP.NET — 85%','Python — 90%','SQL / MySQL / Databases — 92%',
+    'Software Engineering — 88%','Java — 70%','JavaScript / Web — 65%',
+    'C++ — 55%','Git / GitHub — 75%','Data Engineering — 55%'
+  ];
+  const history=[];
+  let historyPosition=0;
 
-  // Ring follows with lag via lerp
-  let ringX = 0, ringY = 0;
-  let mouseX = 0, mouseY = 0;
+  function addLine(text,kind){
+    const line=document.createElement('div');
+    line.className='term-line terminal-output-line'+(kind==='error'?' is-error':'');
+    const span=document.createElement('span');
+    span.className=kind==='command'?'cmd':kind==='error'?'':'out';
+    span.textContent=text;
+    line.appendChild(span);
+    output.appendChild(line);
+    output.scrollTop=output.scrollHeight;
+  }
 
-  document.addEventListener('mousemove', e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    dot.style.left = mouseX + 'px';
-    dot.style.top  = mouseY + 'px';
+  form.addEventListener('submit',event=>{
+    event.preventDefault();
+    const raw=input.value.trim();
+    if(!raw)return;
+    history.push(raw);historyPosition=history.length;
+    const command=raw.toLowerCase().replace(/\s+/g,' ');
+    if(command==='clear'){
+      output.replaceChildren();
+      input.value='';
+      return;
+    }
+    addLine('> '+raw,'command');
+    let lines=[];
+    let error=false;
+    if(command==='whoami'){
+      lines=[bio];
+    }else if(command==='ls projects/'||command==='ls projects'){
+      lines=projectNames;
+    }else if(command==='contact'){
+      lines=[
+        'Email: ibrahimgulian404@gmail.com',
+        'LinkedIn: https://www.linkedin.com/in/gulian-ibrahim/',
+        'GitHub: https://github.com/AgCat80',
+        'WhatsApp: +27 69 340 9750 — https://wa.me/27693409750',
+        'YouTube: https://www.youtube.com/@Isaac_rejoice — Computing Minds'
+      ];
+    }else if(command==='skills'){
+      lines=skillLines;
+    }else if(command==='status'){
+      lines=[
+        '[OPEN] Available for work',
+        '[OPEN] Freelance & contract',
+        'Cape Town | Remote-ready | Open to work'
+      ];
+    }else if(command==='help'){
+      lines=['whoami · ls projects/ · contact · skills · status · clear'];
+    }else{
+      lines=['command not found: '+raw];error=true;
+    }
+    lines.forEach(line=>addLine(line,error?'error':'out'));
+    input.value='';
   });
 
-  (function lerpRing(){
-    ringX += (mouseX - ringX) * 0.12;
-    ringY += (mouseY - ringY) * 0.12;
-    ring.style.left = ringX + 'px';
-    ring.style.top  = ringY + 'px';
-    requestAnimationFrame(lerpRing);
-  })();
-
-  // Hover state on interactive elements
-  const hoverTargets = 'a, button, .btn, .proj-terminal, .c-link, .nav-links a, .pipe-node';
-  document.querySelectorAll(hoverTargets).forEach(el => {
-    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-  });
-
-  // Click flash
-  document.addEventListener('mousedown', () => {
-    document.body.classList.add('cursor-click');
-    setTimeout(() => document.body.classList.remove('cursor-click'), 150);
-  });
-
-  // Hide cursor when it leaves window
-  document.addEventListener('mouseleave', () => {
-    dot.style.opacity  = '0';
-    ring.style.opacity = '0';
-  });
-  document.addEventListener('mouseenter', () => {
-    dot.style.opacity  = '';
-    ring.style.opacity = '';
+  input.addEventListener('keydown',event=>{
+    if(event.key==='ArrowUp'&&history.length){
+      event.preventDefault();
+      historyPosition=Math.max(0,historyPosition-1);
+      input.value=history[historyPosition];
+      input.setSelectionRange(input.value.length,input.value.length);
+    }else if(event.key==='ArrowDown'&&history.length){
+      event.preventDefault();
+      historyPosition=Math.min(history.length,historyPosition+1);
+      input.value=historyPosition===history.length?'':history[historyPosition];
+      input.setSelectionRange(input.value.length,input.value.length);
+    }
   });
 })();
 
-/* ── SCROLL PROGRESS BAR ──────────────────────────────────── */
+/* ── FIRST-VISIT LOADER & HERO TYPEWRITER ──────────────────── */
 (function(){
-  const bar = document.getElementById('scroll-progress');
-  if (!bar) return;
-  window.addEventListener('scroll', () => {
-    const scrolled = window.scrollY;
-    const total    = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.width = (total > 0 ? (scrolled / total) * 100 : 0) + '%';
-  }, { passive: true });
-})();
+  const loader=document.getElementById('loading-screen');
+  const roleText=document.querySelector('#hero-role .role-text');
+  const cursor=document.querySelector('#hero-role .type-cursor');
+  const fullText=roleText?roleText.textContent.trim():'';
+  let typingStarted=false;
 
-/* ── SECTION REVEAL ON SCROLL ─────────────────────────────── */
-(function(){
-  const reveals = document.querySelectorAll('.reveal');
-  if (!reveals.length) return;
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('visible');
-        obs.unobserve(e.target);
+  function typeRole(){
+    if(typingStarted||!roleText)return;
+    typingStarted=true;
+    const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(reduceMotion){
+      roleText.textContent=fullText;
+      if(cursor)cursor.classList.add('is-hidden');
+      return;
+    }
+    roleText.textContent='';
+    if(cursor)cursor.classList.remove('is-hidden');
+    let index=0;
+    const typeNext=()=>{
+      if(index<fullText.length){
+        roleText.textContent+=fullText.charAt(index++);
+        setTimeout(typeNext,45);
+      }else if(cursor){
+        cursor.classList.add('is-hidden');
       }
-    });
-  }, { threshold: 0.1 });
-  reveals.forEach(el => obs.observe(el));
-})();
+    };
+    typeNext();
+  }
 
-/* ── ACTIVE NAV LINK ON SCROLL ────────────────────────────── */
-(function(){
-  const sections = document.querySelectorAll('section[id]');
-  const navLinks = document.querySelectorAll('.nav-links a');
-  if (!sections.length || !navLinks.length) return;
-
-  const obs = new IntersectionObserver(entries => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        navLinks.forEach(a => a.classList.remove('active'));
-        const active = document.querySelector(`.nav-links a[href="#${e.target.id}"]`);
-        if (active) active.classList.add('active');
+  let seenThisSession=false;
+  try{seenThisSession=sessionStorage.getItem('agcat80-portfolio-loaded')==='1'}catch(_error){}
+  if(seenThisSession){
+    if(loader)loader.remove();
+    typeRole();
+  }else{
+    try{sessionStorage.setItem('agcat80-portfolio-loaded','1')}catch(_error){}
+    setTimeout(()=>{
+      if(loader){
+        loader.classList.add('is-done');
+        setTimeout(()=>{
+          loader.remove();
+          typeRole();
+        },500);
+      }else{
+        typeRole();
       }
-    });
-  }, { threshold: 0.4 });
-
-  sections.forEach(s => obs.observe(s));
+    },2500);
+  }
 })();
 
-/* ── MAGNETIC BUTTON EFFECT ───────────────────────────────── */
+/* ── SCROLL REVEALS, COUNTERS, NAV & POINTER EFFECTS ──────── */
 (function(){
-  document.querySelectorAll('.btn').forEach(btn => {
-    btn.addEventListener('mousemove', e => {
-      const r   = btn.getBoundingClientRect();
-      const dx  = e.clientX - (r.left + r.width  / 2);
-      const dy  = e.clientY - (r.top  + r.height / 2);
-      btn.style.transform = `translate(${dx * 0.18}px, ${dy * 0.18}px)`;
+  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const revealTargets=[];
+  function markReveal(element,delay){
+    if(!element||element.dataset.reveal)return;
+    element.dataset.reveal='';
+    element.style.setProperty('--reveal-delay',delay+'ms');
+    revealTargets.push(element);
+  }
+  document.querySelectorAll('.page section').forEach(section=>{
+    markReveal(section.querySelector('.section-label'),0);
+    markReveal(section.querySelector('.section-heading'),0);
+    markReveal(section.querySelector('.section-sub'),100);
+    const children=section.querySelectorAll(
+      '.stat-card,.tl-item,.proj-terminal,.hackathon-card,.skill-item,.contact-terminal,.c-link'
+    );
+    children.forEach((element,index)=>markReveal(element,200+index*80));
+  });
+  if('IntersectionObserver'in window){
+    const revealObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          entry.target.classList.add('is-visible');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    },{threshold:.12});
+    revealTargets.forEach(element=>revealObserver.observe(element));
+  }else{
+    revealTargets.forEach(element=>element.classList.add('is-visible'));
+  }
+
+  const counters=document.querySelectorAll('[data-counter]');
+  function finishCounter(counter){
+    counter.textContent=(counter.dataset.prefix||'')+counter.dataset.target+(counter.dataset.suffix||'');
+  }
+  function animateCounter(counter){
+    const target=Number(counter.dataset.target)||0;
+    const prefix=counter.dataset.prefix||'',suffix=counter.dataset.suffix||'';
+    if(reduced){finishCounter(counter);return}
+    const start=performance.now(),duration=1200;
+    function tick(now){
+      const progress=Math.min(1,(now-start)/duration);
+      const eased=1-Math.pow(1-progress,3);
+      counter.textContent=prefix+Math.floor(target*eased)+suffix;
+      if(progress<1)requestAnimationFrame(tick);
+      else finishCounter(counter);
+    }
+    requestAnimationFrame(tick);
+  }
+  if('IntersectionObserver'in window){
+    const counterObserver=new IntersectionObserver(entries=>{
+      entries.forEach(entry=>{
+        if(entry.isIntersecting){
+          animateCounter(entry.target);
+          counterObserver.unobserve(entry.target);
+        }
+      });
+    },{threshold:.5});
+    counters.forEach(counter=>counterObserver.observe(counter));
+  }else counters.forEach(finishCounter);
+
+  const nav=document.querySelector('nav');
+  const navLinks=[...document.querySelectorAll('.nav-links a')];
+  const indicator=document.getElementById('nav-indicator');
+  function setActiveLink(link){
+    navLinks.forEach(item=>{
+      item.classList.toggle('active',item===link);
+      if(item===link)item.setAttribute('aria-current','location');
+      else item.removeAttribute('aria-current');
     });
-    btn.addEventListener('mouseleave', () => {
-      btn.style.transform = '';
+    if(!nav||!indicator||!link)return;
+    const navRect=nav.getBoundingClientRect(),linkRect=link.getBoundingClientRect();
+    indicator.style.width=linkRect.width+'px';
+    indicator.style.transform='translateX('+(linkRect.left-navRect.left)+'px)';
+  }
+  navLinks.forEach(link=>{
+    link.addEventListener('pointermove',event=>{
+      if(event.pointerType==='touch')return;
+      const rect=link.getBoundingClientRect();
+      const x=(event.clientX-(rect.left+rect.width/2))*.08;
+      const y=(event.clientY-(rect.top+rect.height/2))*.08;
+      link.style.transform='translate('+x.toFixed(1)+'px,'+y.toFixed(1)+'px)';
     });
+    link.addEventListener('pointerleave',()=>{link.style.transform=''});
+  });
+  const observedSections=navLinks.map(link=>document.querySelector(link.getAttribute('href'))).filter(Boolean);
+  if('IntersectionObserver'in window){
+    const sectionObserver=new IntersectionObserver(entries=>{
+      const visible=entries.filter(entry=>entry.isIntersecting)
+        .sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+      if(visible){
+        const link=navLinks.find(item=>item.getAttribute('href')==='#'+visible.target.id);
+        if(link)setActiveLink(link);
+      }
+    },{rootMargin:'-18% 0px -65% 0px',threshold:[0,.15,.35,.6]});
+    observedSections.forEach(section=>sectionObserver.observe(section));
+  }
+  window.addEventListener('resize',()=>{
+    const active=navLinks.find(link=>link.classList.contains('active'));
+    if(active)setActiveLink(active);
+  },{passive:true});
+
+  if(!reduced&&window.matchMedia('(pointer:fine)').matches){
+    document.querySelectorAll('.proj-terminal').forEach(card=>{
+      card.addEventListener('pointermove',event=>{
+        const rect=card.getBoundingClientRect();
+        const x=(event.clientX-rect.left)/rect.width;
+        const y=(event.clientY-rect.top)/rect.height;
+        const rotateY=(x-.5)*16,rotateX=(.5-y)*16;
+        card.style.setProperty('--glare-x',(x*100)+'%');
+        card.style.setProperty('--glare-y',(y*100)+'%');
+        card.style.transform='perspective(900px) rotateX('+rotateX.toFixed(2)+'deg) rotateY('+rotateY.toFixed(2)+'deg) translateY(-2px)';
+      });
+      card.addEventListener('pointerleave',()=>{
+        card.style.transform='';
+        card.style.setProperty('--glare-x','50%');
+        card.style.setProperty('--glare-y','50%');
+      });
+    });
+  }
+
+  const sentinel=document.getElementById('back-top-sentinel');
+  const backToTop=document.getElementById('back-to-top');
+  if(sentinel&&backToTop&&'IntersectionObserver'in window){
+    const topObserver=new IntersectionObserver(entries=>{
+      const passed=entries[0].boundingClientRect.top<0;
+      backToTop.classList.toggle('is-visible',passed);
+      backToTop.setAttribute('aria-hidden',String(!passed));
+      backToTop.tabIndex=passed?0:-1;
+    });
+    topObserver.observe(sentinel);
+    backToTop.addEventListener('click',()=>window.scrollTo({top:0,behavior:reduced?'auto':'smooth'}));
+  }
+})();
+
+/* ── KEYBOARD EASTER EGG ───────────────────────────────────── */
+(function(){
+  let typed='';
+  let toastTimer;
+  const toast=document.getElementById('shortcut-toast');
+  document.addEventListener('keydown',event=>{
+    if(event.target.closest&&event.target.closest('input,textarea,select,[contenteditable="true"]')){
+      typed='';return;
+    }
+    if(event.key.length!==1)return;
+    typed=(typed+event.key.toLowerCase()).slice(-7);
+    if(typed==='agcat80'){
+      if(window.triggerMatrixRain)window.triggerMatrixRain();
+      if(toast){
+        toast.classList.add('is-visible');
+        clearTimeout(toastTimer);
+        toastTimer=setTimeout(()=>toast.classList.remove('is-visible'),3000);
+      }
+      typed='';
+    }
   });
 })();
 </script>
