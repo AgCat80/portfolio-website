@@ -13,6 +13,7 @@
 <meta name="twitter:card" content="summary_large_image"/>
 <meta name="twitter:title" content="Gulian Ibrahim — Data Engineer Portfolio"/>
 <meta name="twitter:description" content="Building systems that move, transform, and expose data. Currently studying Computing at STADIO; previously shipped real IT operations solo at Legates Group. Competes in hackathons, writes code, makes music on the side."/>
+<link rel="icon" type="image/png" href="ag-favicon.png"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
 <style>
@@ -444,6 +445,50 @@ footer span{color:var(--teal)}
   .contact-grid{display:block!important}
   .pipeline{flex-wrap:wrap;gap:.4rem;overflow:visible}
 }
+
+/* ── GHOST RIDER FLAME CURSOR ───────────────────────────────── */
+body { cursor: none; }
+a, button, .btn, .proj-terminal, .c-link, .nav-links a,
+.pipe-node, input, textarea, select { cursor: none; }
+
+#flame-canvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 9997;
+}
+
+#cursor-glow {
+  position: fixed;
+  width: 10px; height: 10px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  box-shadow:
+    0 0 6px 2px #00FFD1,
+    0 0 14px 4px #00BFFF,
+    0 0 30px 8px rgba(0,180,255,0.4);
+  transition: width .1s, height .1s, box-shadow .15s;
+}
+
+body.flame-click #cursor-glow {
+  width: 6px; height: 6px;
+  box-shadow:
+    0 0 10px 4px #fff,
+    0 0 24px 8px #00FFD1,
+    0 0 40px 12px rgba(0,191,255,0.7);
+}
+
+body.flame-hover #cursor-glow {
+  width: 14px; height: 14px;
+  box-shadow:
+    0 0 8px 3px #fff,
+    0 0 20px 6px #8B5CF6,
+    0 0 40px 12px rgba(139,92,246,0.5);
+}
 </style>
 </head>
 <body>
@@ -466,6 +511,10 @@ footer span{color:var(--teal)}
   </ul>
   <span class="nav-indicator" id="nav-indicator" aria-hidden="true"></span>
 </nav>
+
+
+<canvas id="flame-canvas"></canvas>
+<div id="cursor-glow"></div>
 
 <div class="page">
 
@@ -1396,5 +1445,177 @@ footer span{color:var(--teal)}
   });
 })();
 </script>
+
+<script>
+/* ── GHOST RIDER BLUE FLAME CURSOR ───────────────────────────────────────────
+   Blue-flame Ghost Rider aesthetic:
+   - Particles spawn at cursor, rise, shrink and fade
+   - Core: white → electric cyan → teal → deep blue → violet → transparent
+   - Bonus: occasional full-blue streak flares
+   - Mouse repulsion: nearby particles drift away on fast moves
+   - Click burst: 30 extra particles explode outward
+   ─────────────────────────────────────────────────────────────────────────── */
+(function () {
+  const canvas = document.getElementById('flame-canvas');
+  const ctx    = canvas.getContext('2d');
+  const glow   = document.getElementById('cursor-glow');
+
+  let W, H, mx = -200, my = -200, pmx = -200, pmy = -200;
+  let particles = [];
+  let frame = 0;
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener('resize', resize, { passive: true });
+
+  // ── Colour palette: white core → teal → blue → violet ──────────────────
+  const COLORS = [
+    'rgba(255,255,255,',    // white core
+    'rgba(180,255,255,',    // icy white-teal
+    'rgba(0,255,209,',      // teal (#00FFD1)
+    'rgba(0,220,255,',      // electric cyan
+    'rgba(0,140,255,',      // mid blue
+    'rgba(30,80,255,',      // deep blue
+    'rgba(100,60,255,',     // blue-violet
+    'rgba(139,92,246,',     // violet (#8B5CF6)
+  ];
+
+  function randColor() {
+    return COLORS[Math.floor(Math.random() * COLORS.length)];
+  }
+
+  // ── Particle factory ────────────────────────────────────────────────────
+  function spawnParticle(x, y, burst) {
+    const angle  = burst
+      ? Math.random() * Math.PI * 2
+      : (Math.PI * 1.5) + (Math.random() - 0.5) * 1.2; // upward spread
+
+    const speed  = burst ? Math.random() * 5 + 2 : Math.random() * 3 + 0.8;
+    const isFlare = !burst && Math.random() < 0.08; // rare blue streak
+
+    return {
+      x,  y,
+      vx: Math.cos(angle) * speed * (burst ? 1 : 0.6),
+      vy: Math.sin(angle) * speed,
+      life: 1,
+      decay: burst
+        ? Math.random() * 0.06 + 0.05
+        : Math.random() * 0.025 + 0.01,
+      size: burst
+        ? Math.random() * 4 + 2
+        : isFlare
+          ? Math.random() * 7 + 5
+          : Math.random() * 5 + 2,
+      color: randColor(),
+      isFlare,
+      flicker: Math.random() * Math.PI * 2, // phase offset for flicker
+    };
+  }
+
+  function burst(x, y, n) {
+    for (let i = 0; i < n; i++) particles.push(spawnParticle(x, y, true));
+  }
+
+  // ── Mouse tracking ──────────────────────────────────────────────────────
+  document.addEventListener('mousemove', e => {
+    pmx = mx; pmy = my;
+    mx = e.clientX; my = e.clientY;
+    glow.style.left = mx + 'px';
+    glow.style.top  = my + 'px';
+  }, { passive: true });
+
+  document.addEventListener('mousedown', () => {
+    document.body.classList.add('flame-click');
+    burst(mx, my, 30);
+  });
+  document.addEventListener('mouseup', () => {
+    document.body.classList.remove('flame-click');
+  });
+
+  // Hover state on interactive elements
+  const hoverSel = 'a,button,.btn,.proj-terminal,.c-link,.nav-links a,.pipe-node';
+  document.querySelectorAll(hoverSel).forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('flame-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('flame-hover'));
+  });
+
+  document.addEventListener('mouseleave', () => { glow.style.opacity = '0'; });
+  document.addEventListener('mouseenter', () => { glow.style.opacity = ''; });
+
+  // ── Main render loop ────────────────────────────────────────────────────
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    frame++;
+
+    // Spawn new flame particles at cursor every frame
+    if (mx > 0) {
+      const count = document.body.classList.contains('flame-hover') ? 5 : 3;
+      for (let i = 0; i < count; i++) {
+        particles.push(spawnParticle(
+          mx + (Math.random() - 0.5) * 8,
+          my + (Math.random() - 0.5) * 8,
+          false
+        ));
+      }
+    }
+
+    // Mouse speed — faster mouse = bigger gust effect
+    const dx = mx - pmx, dy = my - pmy;
+    const speed = Math.sqrt(dx * dx + dy * dy);
+
+    // Update and draw particles
+    for (let i = particles.length - 1; i >= 0; i--) {
+      const p = particles[i];
+
+      // Flicker effect on non-burst particles
+      if (p.isFlare) p.vy -= 0.08;
+      p.vy -= 0.04; // buoyancy / rise
+
+      // Slight horizontal turbulence
+      p.vx += (Math.random() - 0.5) * 0.15;
+
+      // Wind from fast mouse movement
+      if (speed > 8) {
+        p.vx += (dx / speed) * 0.3;
+        p.vy += (dy / speed) * 0.15;
+      }
+
+      p.x += p.vx;
+      p.y += p.vy;
+      p.life -= p.decay;
+      p.flicker += 0.18;
+
+      if (p.life <= 0) { particles.splice(i, 1); continue; }
+
+      // Flickering alpha for fire feel
+      const flicker = p.isFlare ? 1 : (0.85 + Math.sin(p.flicker) * 0.15);
+      const alpha   = p.life * flicker;
+      const size    = p.size * p.life;
+
+      // Glow / radial gradient for each particle
+      const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 2);
+      grad.addColorStop(0,   p.color + Math.min(alpha, 1) + ')');
+      grad.addColorStop(0.4, p.color + (alpha * 0.6) + ')');
+      grad.addColorStop(1,   p.color + '0)');
+
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, size * 2, 0, Math.PI * 2);
+      ctx.fillStyle = grad;
+      ctx.fill();
+    }
+
+    // Cap particle count to avoid memory leak
+    if (particles.length > 800) particles.splice(0, particles.length - 800);
+
+    requestAnimationFrame(loop);
+  }
+
+  loop();
+})();
+</script>
+
 </body>
 </html>
